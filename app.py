@@ -377,6 +377,7 @@ def delete_expense(expense_id):
     return redirect(url_for("list_expenses"))
 
 
+init_db()
+
 if __name__ == "__main__":
-    init_db()
     app.run(debug=True)
