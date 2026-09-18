@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="stats">
+    <div class="stat-card">
+      <div class="label">Total Revenue</div>
+      <div class="value">${{ "%.2f"|format(total_revenue) }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Total Expenses</div>
+      <div class="value">${{ "%.2f"|format(total_expenses) }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Net</div>
+      <div class="value {{ 'positive' if net >= 0 else 'negative' }}">{{ '-$%.2f'|format(-net) if net < 0 else '$%.2f'|format(net) }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Units Sold</div>
+      <div class="value">{{ total_units }}</div>
+    </div>
+  </div>
+
+  <h2>Sales Trend</h2>
+  {% if trend_items %}
+  <div class="bar-chart">
+    {% for (key, label), value in trend_items %}
+    <div class="bar-col">
+      <div class="bar-value">${{ "%.0f"|format(value) }}</div>
+      <div class="bar" style="height: {{ (value / max_trend_value * 100)|round(0, 'floor') }}%;"></div>
+      <div class="bar-label">{{ label[:3] }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+    <div class="empty">No sales yet — record one to see the trend.</div>
+  {% endif %}
+
+  <h2>Top Performers</h2>
+  <div class="grid-2">
+    <div class="panel">
+      <h3>Top Products</h3>
+      {% if top_products %}
+        {% for name, total in top_products %}
+        <div class="rank-row"><span>{{ name }}</span><span>${{ "%.2f"|format(total) }}</span></div>
+        {% endfor %}
+      {% else %}
+        <div class="empty">No sales yet.</div>
+      {% endif %}
+    </div>
+    <div class="panel">
+      <h3>Top Customers</h3>
+      {% if top_customers %}
+        {% for name, total in top_customers %}
+        <div class="rank-row"><span>{{ name }}</span><span>${{ "%.2f"|format(total) }}</span></div>
+        {% endfor %}
+      {% else %}
+        <div class="empty">No sales yet.</div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

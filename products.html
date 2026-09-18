@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Products</h2>
+  {% if products %}
+  <table>
+    <thead><tr><th>Name</th><th>Price</th><th>Sales</th><th></th></tr></thead>
+    <tbody>
+      {% for p in products %}
+      <tr>
+        <td>{{ p.name }}</td>
+        <td>${{ "%.2f"|format(p.price) }}</td>
+        <td>{% if p.sale_count %}<span class="chip">{{ p.sale_count }} sales</span>{% else %}—{% endif %}</td>
+        <td>
+          {% if p.sale_count %}
+            <span style="color: var(--muted); font-size: 0.8rem;">Has sales</span>
+          {% else %}
+            <form method="post" action="{{ url_for('delete_product', product_id=p.id) }}" style="margin:0;">
+              <button class="delete-btn" type="submit">Delete</button>
+            </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <div class="empty">No products yet. Click "+ Product" to add one.</div>
+    <a href="{{ url_for('add_product') }}" style="color: var(--blue);">+ Add a product</a>
+  {% endif %}
+{% endblock %}

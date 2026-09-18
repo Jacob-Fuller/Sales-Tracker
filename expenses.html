@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Expenses</h2>
+  {% if grouped %}
+    {% for label, bucket in grouped.items() %}
+      <div class="month-heading">📅 {{ label }}</div>
+      <table>
+        <thead><tr><th>Date</th><th>Description</th><th>Vendor</th><th>Category</th><th>Amount</th><th></th></tr></thead>
+        <tbody>
+          {% for e in bucket.rows %}
+          <tr>
+            <td>{{ e.expense_date }}</td>
+            <td>{{ e.description }}</td>
+            <td>{{ e.vendor or "No Vendor" }}</td>
+            <td><span class="chip">{{ e.category }}</span></td>
+            <td>${{ "%.2f"|format(e.amount) }}</td>
+            <td>
+              <form method="post" action="{{ url_for('delete_expense', expense_id=e.id) }}" style="margin:0;">
+                <button class="delete-btn" type="submit">Delete</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="month-total"><span>Total for {{ label.split(' ')[0] }}</span><span>${{ "%.2f"|format(bucket.total) }}</span></div>
+    {% endfor %}
+  {% else %}
+    <div class="empty">No expenses recorded yet. Click "+ Expense" to add one.</div>
+  {% endif %}
+{% endblock %}

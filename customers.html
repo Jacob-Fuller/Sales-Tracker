@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Customers</h2>
+  {% if customers %}
+  <table>
+    <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Sales</th><th></th></tr></thead>
+    <tbody>
+      {% for c in customers %}
+      <tr>
+        <td>{{ c.name }}</td>
+        <td>{{ c.email or "—" }}</td>
+        <td>{{ c.phone or "—" }}</td>
+        <td>{{ c.sale_count }}</td>
+        <td>
+          <form method="post" action="{{ url_for('delete_customer', customer_id=c.id) }}" style="margin:0;">
+            <button class="delete-btn" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <div class="empty">No customers yet. Click "+ Customer" to add one.</div>
+    <a href="{{ url_for('add_customer') }}" style="color: var(--blue);">+ Add a customer</a>
+  {% endif %}
+{% endblock %}
