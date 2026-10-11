@@ -1,0 +1,37 @@
+# Checks the Profit Pocket app (mobile/) on every push that changes it:
+# installs packages, runs the money-maths tests, type-checks, and bundles the
+# iPhone JavaScript. Nothing is built for the store or deployed.
+name: Profit Pocket check
+
+on:
+  push:
+    paths: ["mobile/**", ".github/workflows/mobile-check.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install
+        run: |
+          npm install --no-audit --no-fund
+          npx expo install --fix
+      - name: Money maths and sync tests
+        run: npm test
+      - name: Type-check
+        run: npx tsc --noEmit
+      - name: Expo config check
+        run: npx expo-doctor || true
+      - name: Bundle for iPhone
+        run: npx expo export --platform ios --output-dir /tmp/pp-export

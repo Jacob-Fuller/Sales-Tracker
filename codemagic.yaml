@@ -1,0 +1,53 @@
+# Builds the Profit Pocket iPhone app (mobile/) on Codemagic's Macs and uploads
+# it to TestFlight, the same way as the native Wisebyte app. No Mac needed.
+# Codemagic -> Add application -> this GitHub repo, then "Start new build" with
+# the "Profit Pocket iOS -> TestFlight" workflow.
+workflows:
+  profit-pocket-ios:
+    name: Profit Pocket iOS → TestFlight
+    max_build_duration: 90
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: Wisebyte ASC   # your App Store Connect API key in Codemagic (account-wide, works for every app)
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: au.profitpocket.app
+      node: 22
+      xcode: latest
+      cocoapods: default
+    triggering:
+      events: []   # manual builds only
+    scripts:
+      - name: Install dependencies
+        script: |
+          cd mobile
+          npm install --legacy-peer-deps --no-audit --no-fund
+          npx expo install --fix -- --legacy-peer-deps
+      - name: Checks (money maths, types, bundle)
+        script: |
+          cd mobile
+          npm test
+          npx tsc --noEmit
+          npx expo export --platform ios --output-dir /tmp/pp-export
+      - name: Generate the iOS project
+        script: |
+          cd mobile
+          npx expo prebuild --platform ios --clean --no-install
+          cd ios && pod install
+      - name: Apply signing profiles
+        script: xcode-project use-profiles --project mobile/ios/*.xcodeproj
+      - name: Set build number
+        script: cd mobile/ios && agvtool new-version -all $((BUILD_NUMBER + 1))
+      - name: Build the app
+        script: |
+          xcode-project build-ipa \
+            --workspace mobile/ios/ProfitPocket.xcworkspace \
+            --scheme ProfitPocket
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true

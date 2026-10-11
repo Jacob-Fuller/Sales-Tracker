@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="180 150 664 720" width="1024" height="1110"><defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1B2136"/><stop offset="1" stop-color="#0B0E18"/></linearGradient>
+    <linearGradient id="pk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF8F5E"/><stop offset="1" stop-color="#F2612E"/></linearGradient>
+    <linearGradient id="coin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5EEAD4"/><stop offset="1" stop-color="#14B8A6"/></linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.62" r="0.5"><stop offset="0" stop-color="#FF7A45" stop-opacity="0.28"/><stop offset="1" stop-color="#FF7A45" stop-opacity="0"/></radialGradient>
+  </defs><g id="mark">
+    <circle cx="600" cy="318" r="122" fill="url(#coin)"/>
+    <circle cx="600" cy="318" r="84" fill="none" stroke="#0F766E" stroke-opacity="0.45" stroke-width="16"/>
+    <path d="M262 382 H762 V636 Q762 668 734 684 L540 790 Q512 806 484 790 L290 684 Q262 668 262 636 Z" fill="url(#pk)"/>
+    <path d="M300 430 H724" stroke="#2A1004" stroke-opacity="0.35" stroke-width="10" stroke-linecap="round" stroke-dasharray="2 26"/>
+    <polyline points="352,632 450,540 532,598 664,478" fill="none" stroke="#2A1004" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
+    <polyline points="594,474 670,472 668,548" fill="none" stroke="#2A1004" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
+  </g></svg>

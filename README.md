@@ -1,4 +1,9 @@
-# Sales Tracker
+# Sales Tracker / Profit Pocket
+
+> **The iPhone app now lives in [`mobile/`](mobile/README.md)** (React Native/Expo,
+> named Profit Pocket). Privacy and support pages are in `docs/`. The Flask web
+> version below is the earlier build and is kept for reference.
+
 
 A local sales tracking app: manage products, customers, sales, and expenses,
 with a dashboard showing revenue, net profit, sales trends, and top performers.
