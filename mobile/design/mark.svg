@@ -1,13 +1,92 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="180 150 664 720" width="1024" height="1110"><defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1B2136"/><stop offset="1" stop-color="#0B0E18"/></linearGradient>
-    <linearGradient id="pk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF8F5E"/><stop offset="1" stop-color="#F2612E"/></linearGradient>
-    <linearGradient id="coin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5EEAD4"/><stop offset="1" stop-color="#14B8A6"/></linearGradient>
-    <radialGradient id="glow" cx="0.5" cy="0.62" r="0.5"><stop offset="0" stop-color="#FF7A45" stop-opacity="0.28"/><stop offset="1" stop-color="#FF7A45" stop-opacity="0"/></radialGradient>
-  </defs><g id="mark">
-    <circle cx="600" cy="318" r="122" fill="url(#coin)"/>
-    <circle cx="600" cy="318" r="84" fill="none" stroke="#0F766E" stroke-opacity="0.45" stroke-width="16"/>
-    <path d="M262 382 H762 V636 Q762 668 734 684 L540 790 Q512 806 484 790 L290 684 Q262 668 262 636 Z" fill="url(#pk)"/>
-    <path d="M300 430 H724" stroke="#2A1004" stroke-opacity="0.35" stroke-width="10" stroke-linecap="round" stroke-dasharray="2 26"/>
-    <polyline points="352,632 450,540 532,598 664,478" fill="none" stroke="#2A1004" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
-    <polyline points="594,474 670,472 668,548" fill="none" stroke="#2A1004" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
-  </g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="190 150 644 730" width="1024" height="1161"><defs>
+    <radialGradient id="bg" cx="0.5" cy="0.38" r="0.85">
+      <stop offset="0" stop-color="#25304F"/><stop offset="0.55" stop-color="#141A2E"/><stop offset="1" stop-color="#090C16"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.6" r="0.45">
+      <stop offset="0" stop-color="#FF7A45" stop-opacity="0.35"/><stop offset="1" stop-color="#FF7A45" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="leather" x1="0" y1="0" x2="0.25" y2="1">
+      <stop offset="0" stop-color="#FFA06E"/><stop offset="0.45" stop-color="#F2703A"/><stop offset="1" stop-color="#C24A1C"/>
+    </linearGradient>
+    <linearGradient id="lip" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFB487"/><stop offset="1" stop-color="#E5612C"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0.15" y1="0.1" x2="0.85" y2="0.95">
+      <stop offset="0" stop-color="#FFF1B8"/><stop offset="0.35" stop-color="#F6C94E"/><stop offset="0.7" stop-color="#D99A1F"/><stop offset="1" stop-color="#A86A0C"/>
+    </linearGradient>
+    <linearGradient id="goldRim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#B97A12"/><stop offset="0.5" stop-color="#8A5508"/><stop offset="1" stop-color="#6E4205"/>
+    </linearGradient>
+    <linearGradient id="goldFace" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0" stop-color="#FFE38A"/><stop offset="1" stop-color="#E3A42A"/>
+    </linearGradient>
+    <linearGradient id="teal" x1="0.15" y1="0.1" x2="0.85" y2="0.95">
+      <stop offset="0" stop-color="#B9FFF2"/><stop offset="0.4" stop-color="#3FE0C6"/><stop offset="1" stop-color="#0F8F80"/>
+    </linearGradient>
+    <linearGradient id="tealFace" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0" stop-color="#7DF3DF"/><stop offset="1" stop-color="#17B3A0"/>
+    </linearGradient>
+    <linearGradient id="arrow" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.92"/><stop offset="1" stop-color="#FFF3E8"/>
+    </linearGradient>
+    <filter id="tex" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="7" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.10 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+    <filter id="drop" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="26" stdDeviation="26" flood-color="#000" flood-opacity="0.55"/>
+    </filter>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#3A1405" flood-opacity="0.45"/>
+    </filter>
+    <filter id="emboss" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="5" stdDeviation="3" flood-color="#5A1E06" flood-opacity="0.55"/>
+    </filter>
+    <clipPath id="pocketClip"><path d="M222 404 H802 V676 Q802 716 766 734 L548 842 Q512 860 476 842 L258 734 Q222 716 222 676 Z"/></clipPath>
+  </defs><!-- coins behind the pocket -->
+  <g filter="url(#soft)">
+    <g transform="rotate(-14 388 330)">
+      <circle cx="388" cy="330" r="128" fill="url(#goldRim)"/>
+      <circle cx="388" cy="322" r="128" fill="url(#gold)"/>
+      <circle cx="388" cy="322" r="98" fill="url(#goldFace)"/>
+      <circle cx="388" cy="322" r="98" fill="none" stroke="#B87A14" stroke-opacity="0.55" stroke-width="6"/>
+      <path d="M300 250 Q360 210 430 222" fill="none" stroke="#FFFBE6" stroke-opacity="0.8" stroke-width="14" stroke-linecap="round"/>
+      <text x="388" y="364" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="120" fill="#B6780F" fill-opacity="0.85">$</text>
+    </g>
+    <g transform="rotate(10 628 296)">
+      <circle cx="628" cy="304" r="120" fill="#0B6F64"/>
+      <circle cx="628" cy="296" r="120" fill="url(#teal)"/>
+      <circle cx="628" cy="296" r="92" fill="url(#tealFace)"/>
+      <circle cx="628" cy="296" r="92" fill="none" stroke="#0C8A7B" stroke-opacity="0.6" stroke-width="6"/>
+      <path d="M546 232 Q600 196 664 206" fill="none" stroke="#E9FFFB" stroke-opacity="0.8" stroke-width="13" stroke-linecap="round"/>
+      <path d="M586 330 L618 296 L640 318 L676 274" fill="none" stroke="#0B6F64" stroke-opacity="0.75" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+
+  <!-- pocket -->
+  <g filter="url(#drop)">
+    <path d="M222 404 H802 V676 Q802 716 766 734 L548 842 Q512 860 476 842 L258 734 Q222 716 222 676 Z" fill="url(#leather)"/>
+    <g clip-path="url(#pocketClip)">
+      <rect x="200" y="380" width="640" height="500" filter="url(#tex)" fill="#000"/>
+      <path d="M222 404 H802 V470 H222 Z" fill="url(#lip)"/>
+      <path d="M222 470 H802" stroke="#9E3A12" stroke-opacity="0.55" stroke-width="5"/>
+      <path d="M222 474 H802" stroke="#FFC7A3" stroke-opacity="0.35" stroke-width="3"/>
+      <ellipse cx="420" cy="520" rx="320" ry="120" fill="#FFFFFF" fill-opacity="0.08"/>
+      <path d="M222 690 Q512 900 802 690 V880 H222 Z" fill="#7E2A0A" fill-opacity="0.22"/>
+    </g>
+    <!-- stitching -->
+    <path d="M252 437 H772" stroke="#FFE2CF" stroke-opacity="0.85" stroke-width="7" stroke-linecap="round" stroke-dasharray="16 15"/>
+    <path d="M254 500 V672 Q254 700 280 713 L496 820 Q512 828 528 820 L744 713 Q770 700 770 672 V500" fill="none" stroke="#FFE2CF" stroke-opacity="0.75" stroke-width="7" stroke-linecap="round" stroke-dasharray="16 15"/>
+    <!-- rivets -->
+    <g>
+      <circle cx="252" cy="437" r="15" fill="#E9B54A"/><circle cx="252" cy="433" r="10" fill="#FFE7A0"/>
+      <circle cx="772" cy="437" r="15" fill="#E9B54A"/><circle cx="772" cy="433" r="10" fill="#FFE7A0"/>
+    </g>
+    <!-- rising line, embossed -->
+    <g filter="url(#emboss)">
+      <polyline points="322,700 432,598 520,652 664,520" fill="none" stroke="url(#arrow)" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+      <polyline points="590,514 672,512 670,594" fill="none" stroke="url(#arrow)" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+</svg>
