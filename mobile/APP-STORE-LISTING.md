@@ -37,7 +37,6 @@ MADE TO FIT YOU
 • Your own expense categories
 • Any currency, and your own financial year
 • Add your logo to each project
-• Optional account to back up and sync your numbers
 
 No ads. No tracking. Your numbers stay yours.
 
