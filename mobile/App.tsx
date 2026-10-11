@@ -19,6 +19,7 @@ import { CustomerForm, ExpenseForm, GroupForm, ItemForm, ProductForm, SaleForm }
 import { GroupScreen, HomeScreen, ItemScreen, ProjectsScreen } from "./src/screens/HomeScreens";
 import { AddScreen, CustomersScreen, ExpensesScreen, ProductsScreen, SalesScreen } from "./src/screens/ListScreens";
 import { AccountScreen, CategoriesScreen, ChannelsScreen, PaywallScreen, SettingsScreen } from "./src/screens/SettingsScreens";
+import { TaxReportScreen } from "./src/screens/TaxReportScreen";
 import { C, F } from "./src/theme";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -76,6 +77,7 @@ function tabStack(name: string, title: string, Component: React.ComponentType<an
         <Stack.Screen name="ItemDetail" component={ItemScreen} options={{ title: "" }} />
         <Stack.Screen name="Customers" component={CustomersScreen} options={{ title: "Customers" }} />
         <Stack.Screen name="Settings" component={SettingsScreen} options={{ title: "Settings" }} />
+        <Stack.Screen name="TaxReports" component={TaxReportScreen} options={{ title: "Tax reports" }} />
         <Stack.Screen name="Channels" component={ChannelsScreen} options={{ title: "Sales channels", headerLargeTitle: false }} />
         <Stack.Screen name="Categories" component={CategoriesScreen} options={{ title: "Expense categories", headerLargeTitle: false }} />
         <Stack.Screen name="Account" component={AccountScreen} options={{ title: "Account", headerLargeTitle: false }} />

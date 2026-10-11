@@ -57,6 +57,12 @@ export function SettingsScreen() {
         </>
       ) : null}
 
+      <SectionHead title="Tax" />
+      <List>
+        <Row lead={<Ionicons name="document-text-outline" size={20} color={C.ember} />} title="Tax reports" sub="PDF for each financial year" chevron
+          onPress={() => nav.push("TaxReports")} />
+      </List>
+
       <SectionHead title="Money" />
       <Field label="Currency">
         <Select value={s.currency} onChange={(v) => set({ currency: v })}

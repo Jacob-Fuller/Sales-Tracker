@@ -5,6 +5,7 @@ import { addRecord, patchRecord, removeRecord } from "./actions.ts";
 import { expensesAll, groupKeys, nextDue, occurrences, range, recurringMonthly, salesJoined, totalsFor, trend } from "./calc.ts";
 import { mergeSnapshots, sameSnapshot, buildHistory } from "./merge.ts";
 import { emptySnapshot, normaliseSnapshot, keyOf, parseKey, type Snapshot } from "./model.ts";
+import { taxData, taxReportHtml, taxYear, taxYears } from "./taxReport.ts";
 
 let n = 0;
 const test = (name: string, fn: () => void) => { fn(); n++; console.log("ok -", name); };
@@ -136,6 +137,38 @@ test("links round-trip", () => {
 test("backup history only adds when there is data", () => {
   assert.equal(buildHistory(emptySnapshot()).length, 0);
   assert.equal(buildHistory(sample()).length, 1);
+});
+
+test("financial year ranges and labels", () => {
+  const au = taxYear(2025, 7);
+  assert.deepEqual(au.range, { from: "2025-07-01", to: "2026-07-01" });
+  assert.equal(au.short, "2025–26");
+  assert.equal(au.label, "1 Jul 2025 to 30 Jun 2026");
+  const us = taxYear(2026, 1);
+  assert.equal(us.short, "2026");
+  assert.equal(us.label, "1 Jan 2026 to 31 Dec 2026");
+});
+
+test("tax years go back to the earliest record", () => {
+  const d = sample();
+  const ys = taxYears(d, 7, new Date(2026, 9, 12));
+  assert.deepEqual(ys.map((y) => y.short), ["2026–27", "2025–26"]);
+});
+
+test("tax report totals", () => {
+  const d = sample();
+  const t = taxData(d, taxYear(2026, 7), "2026-10-12");
+  assert.equal(t.sales.length, 1);
+  assert.equal(t.gross.toFixed(2), "27.00");
+  assert.equal(t.fees.toFixed(2), "4.05");
+  // icons 20 + AI subscription Jul, Aug, Sep, Oct (31st clamps) = 20 + 30*3 (Jul 31, Aug 31, Sep 30); Oct 31 not yet due
+  assert.equal(t.spent, 20 + 90);
+  assert.equal(t.profit.toFixed(2), (22.95 - 110).toFixed(2));
+  assert.equal(t.byMonth.length, 12);
+  assert.equal(t.byMonth[1].label, "Aug 2026");
+  assert.equal(t.byCategory[0].name, "AI tools");
+  const html = taxReportHtml(d, taxYear(2026, 7), (n) => "$" + n.toFixed(2), { linkLabel: () => "x", generated: new Date(2026, 9, 12) });
+  assert.ok(html.includes("2026–27") && html.includes("$22.95"));
 });
 
 console.log(`${n} checks passed`);
