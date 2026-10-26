@@ -60,4 +60,4 @@ Attach both to the version before submitting. The Paid Apps Agreement must be ac
 - No tracking, no analytics, no advertising.
 
 ## App Review notes
-Abacus Board works fully without an account; no sign-in is needed to review it. Premium can be tested with a Sandbox account from the paywall (Settings → Go Premium, or by adding a second project).
+Abacus Board works fully without an account; no sign-in is needed to review it. Premium can be tested with a Sandbox account from the paywall (Settings → Go Premium, or by adding a fourth project).
