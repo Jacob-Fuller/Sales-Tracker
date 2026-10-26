@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Profit Pocket",
+    "name": "Abacus Board",
     "slug": "profit-pocket",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -15,7 +15,7 @@
       "supportsTablet": false,
       "config": { "usesNonExemptEncryption": false },
       "infoPlist": {
-        "CFBundleDisplayName": "Profit Pocket",
+        "CFBundleDisplayName": "Abacus Board",
         "ITSAppUsesNonExemptEncryption": false
       },
       "privacyManifests": {
@@ -30,7 +30,7 @@
     },
     "android": {
       "package": "au.profitpocket.app",
-      "adaptiveIcon": { "foregroundImage": "./assets/adaptive-icon.png", "backgroundColor": "#0D101B" }
+      "adaptiveIcon": { "foregroundImage": "./assets/adaptive-icon.png", "backgroundColor": "#151A3A" }
     },
     "web": { "favicon": "./assets/favicon.png" },
     "plugins": [
@@ -38,7 +38,7 @@
       "expo-iap",
       "expo-font",
       "expo-localization",
-      ["expo-image-picker", { "photosPermission": "Profit Pocket uses your photos so you can add a logo to your projects.", "cameraPermission": false, "microphonePermission": false }]
+      ["expo-image-picker", { "photosPermission": "Abacus Board uses your photos so you can add a logo to your projects.", "cameraPermission": false, "microphonePermission": false }]
     ]
   }
 }

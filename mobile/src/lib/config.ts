@@ -1,7 +1,7 @@
 // App-wide settings. Fill in SUPABASE_URL and SUPABASE_KEY once the Profit
 // Pocket Supabase project exists (see supabase/README.md); until then the app
 // works fully on the phone and the account section stays hidden.
-export const APP_NAME = "Profit Pocket";
+export const APP_NAME = "Abacus Board";
 
 export const SUPABASE_URL = "";
 // The publishable (anon) key is meant to be public; row-level security protects the data.

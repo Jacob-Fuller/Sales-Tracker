@@ -1,4 +1,4 @@
-# Profit Pocket (iPhone app)
+# Abacus Board (iPhone app)
 
 A native app built with React Native and Expo, rebuilt from the Sales Tracker
 web app. It works fully on the phone; an optional account backs up and syncs.
@@ -19,13 +19,13 @@ web app. It works fully on the phone; an optional account backs up and syncs.
 ## Checks
 `npm test` checks the money maths (fees, discounts, recurring dates, financial
 years), deletes and the sync merge. `npx tsc --noEmit` type-checks. GitHub runs
-both on every push to `mobile/` (Actions → "Profit Pocket check").
+both on every push to `mobile/` (Actions → "Abacus Board check").
 
 ## Building for TestFlight (no Mac needed)
 Codemagic builds it from `codemagic.yaml` at the repo root (workflow
-"Profit Pocket iOS → TestFlight"), using the same App Store Connect key as Wisebyte.
+"Abacus Board iOS → TestFlight"), using the same App Store Connect key as Wisebyte.
 Before the first build:
-1. App Store Connect → Apps → + → New App: "Profit Pocket", bundle id
+1. App Store Connect → Apps → + → New App: "Abacus Board", bundle id
    `au.profitpocket.app` (register it under Identifiers first).
 2. Codemagic → add this repo as an app.
 

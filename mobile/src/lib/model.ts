@@ -1,4 +1,4 @@
-// Profit Pocket's data. Everything lives in one snapshot that is saved on the
+// Abacus Board's data. Everything lives in one snapshot that is saved on the
 // phone and, when signed in, synced to the account. Records are merged by id
 // (see merge.ts), so every record carries an id and an updatedAt stamp.
 //

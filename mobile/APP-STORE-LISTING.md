@@ -1,7 +1,7 @@
-# Profit Pocket – App Store listing
+# Abacus Board – App Store listing
 
 ## App information
-- **Name:** Profit Pocket
+- **Name:** Abacus Board
 - **Subtitle:** Sales, expenses & real profit
 - **Bundle ID:** au.profitpocket.app
 - **Primary category:** Finance · **Secondary:** Business
@@ -13,35 +13,33 @@
 Know exactly what you keep. Record a sale, log a cost, and see your real profit, with store fees and subscriptions already counted.
 
 ## Description
-Profit Pocket shows you what your side hustle or small business actually makes.
+Abacus Board shows you what your side hustle or small business actually makes.
 
-Record a sale in seconds and Profit Pocket takes off the store's cut for you, whether you sell on the App Store, Etsy, eBay, at the markets or from your own website. Add your costs and subscriptions once and every payment is counted on its own date, so your profit is always up to date without the spreadsheet.
+Record a sale in seconds and Abacus Board takes off the store's cut for you, whether you sell on the App Store, Etsy, eBay, at the markets or from your own website. Add your costs and subscriptions once and every payment is counted on its own date, so your profit is always up to date without the spreadsheet.
 
 KNOW YOUR REAL NUMBERS
 • Profit, money in and money out for this month, this financial year or all time
 • Store fees and discounts taken off automatically
-• A clear six-month chart of what came in against what went out
+• Profit for each of your projects, like "Handmade jewellery" or "iOS apps"
 
-BUILT AROUND YOUR PROJECTS
-• Group what you sell into projects, like "Handmade jewellery" or "iOS apps"
-• See profit for a whole project and for each thing inside it
-• Shared costs, like a software subscription that covers everything, count once against the whole project
-
-RECURRING COSTS, HANDLED
+REPEATING COSTS, HANDLED
 • Weekly, fortnightly, monthly, quarterly or yearly
-• See what you're committed to each month and when each payment is next due
+• See what you spend each month and when each payment is next due
 • Stop a cost when you cancel it and keep its history
+
+TAX TIME, SORTED
+• A PDF of every sale and expense for each financial year, with totals
 
 MADE TO FIT YOU
 • Your own sales channels with their fees
 • Your own expense categories
 • Any currency, and your own financial year
-• Add your logo to each project
+• Clean and simple, in light or dark mode
 
 No ads. No tracking. Your numbers stay yours.
 
-PROFIT POCKET PREMIUM
-The free plan includes every feature for a small setup. Premium unlocks unlimited projects, items and recurring costs, monthly or as a one-off lifetime purchase. The monthly plan renews automatically unless cancelled at least 24 hours before the end of the period; manage it in your Apple ID settings.
+ABACUS BOARD PREMIUM
+The free plan includes every feature for a small setup. Premium unlocks unlimited projects and repeating costs, monthly or as a one-off lifetime purchase. The monthly plan renews automatically unless cancelled at least 24 hours before the end of the period; manage it in your Apple ID settings.
 Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
 
 ## Keywords (100 characters max)
@@ -57,9 +55,9 @@ Attach both to the version before submitting. The Paid Apps Agreement must be ac
 
 ## App Privacy answers
 - **Contact Info → Email Address:** collected only if the person creates an account. App Functionality. Linked to the user. Not used for tracking.
-- **User Content → Other User Content** (their sales and expense records, logos): collected only with an account (sync). App Functionality. Linked to the user. Not used for tracking.
+- **User Content → Other User Content** (their sales and expense records): collected only with an account (sync). App Functionality. Linked to the user. Not used for tracking.
 - **Purchases:** handled by Apple; the app only checks entitlement. Answer "No" unless App Store Connect asks specifically.
 - No tracking, no analytics, no advertising.
 
 ## App Review notes
-Profit Pocket works fully without an account; no sign-in is needed to review it. Premium can be tested with a Sandbox account from the paywall (Settings → Go Premium, or by adding a second project).
+Abacus Board works fully without an account; no sign-in is needed to review it. Premium can be tested with a Sandbox account from the paywall (Settings → Go Premium, or by adding a second project).

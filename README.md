@@ -1,7 +1,7 @@
-# Sales Tracker / Profit Pocket
+# Sales Tracker / Abacus Board
 
 > **The iPhone app now lives in [`mobile/`](mobile/README.md)** (React Native/Expo,
-> named Profit Pocket). Privacy and support pages are in `docs/`. The Flask web
+> named Abacus Board). Privacy and support pages are in `docs/`. The Flask web
 > version below is the earlier build and is kept for reference.
 
 
