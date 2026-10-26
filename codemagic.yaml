@@ -1,7 +1,7 @@
-# Builds the Profit Pocket iPhone app (mobile/) on Codemagic's Macs and uploads
+# Builds the Abacus Board iPhone app (mobile/) on Codemagic's Macs and uploads
 # it to TestFlight, the same way as the native Wisebyte app. No Mac needed.
-# Codemagic -> Add application -> this GitHub repo, then "Start new build" with
-# the "Profit Pocket iOS -> TestFlight" workflow.
+# Every push to main that changes mobile/ (or this file) builds and uploads a
+# new TestFlight build automatically.
 workflows:
   profit-pocket-ios:
     name: Profit Pocket iOS → TestFlight
@@ -17,7 +17,18 @@ workflows:
       xcode: latest
       cocoapods: default
     triggering:
-      events: []   # manual builds only
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+          source: true
+      cancel_previous_builds: true
+    when:
+      changeset:
+        includes:
+          - mobile/
+          - codemagic.yaml
     scripts:
       - name: Install dependencies
         script: |
@@ -41,9 +52,11 @@ workflows:
         script: cd mobile/ios && agvtool new-version -all $((BUILD_NUMBER + 1))
       - name: Build the app
         script: |
+          # Expo names the Xcode project after the app, so find it rather than hard-code it.
+          WS=$(ls -d mobile/ios/*.xcworkspace | head -1)
           xcode-project build-ipa \
-            --workspace mobile/ios/ProfitPocket.xcworkspace \
-            --scheme ProfitPocket
+            --workspace "$WS" \
+            --scheme "$(basename "$WS" .xcworkspace)"
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
