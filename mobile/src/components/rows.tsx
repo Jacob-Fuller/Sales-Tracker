@@ -1,135 +1,107 @@
-// The list rows used across screens, and helpers for what a record belongs to.
+// List rows used across screens, and what a record belongs to.
+//
+// Projects: earlier versions had projects ("groups") holding items. Both are
+// shown here as one flat list of projects, so everything already saved keeps
+// its project. New projects are saved as items with no group.
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
-import { ActionSheetIOS, Platform, Text, View } from "react-native";
-import { groupKeys, isActive, itemsIn, nextDue, totalsFor, type ExpenseRow, type Range, type SaleRow } from "../lib/calc";
-import { FREQS, keyOf, shortDate, type Group, type Item, type Link, type Recurring, type Snapshot } from "../lib/model";
+import { ActionSheetIOS, Platform } from "react-native";
+import { isActive, nextDue, type ExpenseRow, type SaleRow } from "../lib/calc";
+import { FREE_LIMITS } from "../lib/config";
+import { FREQS, keyOf, shortDate, type Link, type LinkKey, type Recurring, type Snapshot } from "../lib/model";
 import { usePremium, type LimitKind } from "../lib/premium";
 import { useStore } from "../lib/store";
-import { FREE_LIMITS } from "../lib/config";
-import { C, F } from "../theme";
-import { ItemBadge, Lead, Row, StatusDot, tap, type Option } from "./ui";
+import { usePalette } from "../theme";
+import { Cell, tap, type Option } from "./ui";
 
-/* ---------- names ---------- */
 export const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name);
-export const byCreated = (a: { createdAt: number }, b: { createdAt: number }) => a.createdAt - b.createdAt;
 export const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? "" : "s"}`;
 
-export function linkLabel(d: Snapshot, r: Link) {
-  if (r.itemId) return d.items.find((i) => i.id === r.itemId)?.name || "General";
-  if (r.groupId) return `${d.groups.find((g) => g.id === r.groupId)?.name || "Project"} (shared)`;
-  return "General";
-}
+/* ---------- projects ---------- */
+export type Project = { key: LinkKey; id: string; name: string; kind: "items" | "groups" };
 
-// Choices for what something belongs to, grouped by project.
-export function linkOptions(d: Snapshot, withAll = false): Option[] {
-  const out: Option[] = [];
-  if (withAll) out.push({ value: "all", label: "Everything" });
-  out.push({ value: "general", label: "General (not linked)" });
-  [...d.groups].sort(byCreated).forEach((g) => {
-    out.push({ value: "g:" + g.id, label: `${g.name} (shared)`, section: g.name });
-    itemsIn(d, g.id).forEach((p) => out.push({ value: "p:" + p.id, label: p.name, section: g.name }));
-  });
-  itemsIn(d, null).forEach((p) => out.push({ value: "p:" + p.id, label: p.name, section: "Not in a project" }));
-  return out;
+export function projects(d: Snapshot): Project[] {
+  return [
+    ...d.items.map((i) => ({ key: "p:" + i.id, id: i.id, name: i.name, kind: "items" as const })),
+    ...d.groups.map((g) => ({ key: "g:" + g.id, id: g.id, name: g.name, kind: "groups" as const })),
+  ].sort(byName);
 }
-export const validLink = (d: Snapshot, k: string) =>
-  k === "general" || (k.startsWith("g:") && d.groups.some((g) => "g:" + g.id === k)) || (k.startsWith("p:") && d.items.some((i) => "p:" + i.id === k));
+export const findProject = (d: Snapshot, key: LinkKey) => projects(d).find((p) => p.key === key);
+export const projectName = (d: Snapshot, r: Link) => (keyOf(r) === "general" ? null : findProject(d, keyOf(r))?.name || null);
+export const projectOptions = (d: Snapshot): Option[] => [{ value: "general", label: "None" }, ...projects(d).map((p) => ({ value: p.key, label: p.name }))];
+export const validLink = (d: Snapshot, k: string) => k === "general" || !!findProject(d, k);
+// Used by the tax report.
+export const linkLabel = (d: Snapshot, r: Link) => projectName(d, r) || "—";
+
+const dot = (...parts: (string | null | undefined)[]) => parts.filter(Boolean).join(" · ");
 
 /* ---------- rows ---------- */
-export function SaleItem({ s, first }: { s: SaleRow; first?: boolean }) {
-  const { data, money } = useStore();
-  const nav = useNavigation<any>();
-  const link = keyOf(s) !== "general" ? " · " + linkLabel(data, s) : "";
-  return (
-    <Row first={first} lead={<Lead icon="arrow-up" tone="sale" />} title={s.productName}
-      sub={`${shortDate(s.date)} · ${s.channel}${link}`} amount={money.money(s.net)} tone="gain"
-      amountSub={s.feeAmount || s.discount ? `of ${money.money(s.gross)}` : undefined}
-      onPress={() => nav.navigate("Sale", { id: s.id })} />
-  );
-}
-
-export function ExpenseItem({ e, first }: { e: ExpenseRow; first?: boolean }) {
+export function SaleCell({ s, first, inProject }: { s: SaleRow; first?: boolean; inProject?: boolean }) {
   const { data, money } = useStore();
   const nav = useNavigation<any>();
   return (
-    <Row first={first} lead={e.recurringId ? <Lead icon="repeat" tone="recur" /> : <Lead icon="arrow-down" tone="exp" />}
-      title={e.description} sub={`${shortDate(e.date)} · ${linkLabel(data, e)}`} amount={money.money(e.amount)}
-      onPress={() => nav.navigate("Expense", e.recurringId ? { id: e.recurringId, recurring: true } : { id: e.id })} />
+    <Cell first={first} title={s.productName} subtitle={dot(shortDate(s.date), s.channel, inProject ? null : projectName(data, s))}
+      value={"+" + money.money(s.net)} tone="gain" onPress={() => nav.navigate("Sale", { id: s.id })} />
   );
 }
 
-export function RecurringItem({ r, first }: { r: Recurring; first?: boolean }) {
+export function ExpenseCell({ e, first, inProject }: { e: ExpenseRow; first?: boolean; inProject?: boolean }) {
+  const { data, money } = useStore();
+  const nav = useNavigation<any>();
+  const freq = e.frequency ? (FREQS as any)[e.frequency]?.label : null;
+  return (
+    <Cell first={first} title={e.description} subtitle={dot(shortDate(e.date), freq, inProject ? null : projectName(data, e))}
+      value={money.money(e.amount)} onPress={() => nav.navigate("Expense", e.recurringId ? { id: e.recurringId, recurring: true } : { id: e.id })} />
+  );
+}
+
+export function RecurringCell({ r, first }: { r: Recurring; first?: boolean }) {
   const { data, money } = useStore();
   const nav = useNavigation<any>();
   const f = FREQS[r.frequency] || FREQS.monthly, active = isActive(r), nd = active ? nextDue(r) : null;
   return (
-    <Row first={first} lead={<Lead icon="repeat" tone="recur" />} title={r.description}
-      sub={active ? `${f.label}${nd ? " · next " + shortDate(nd) : ""} · ${linkLabel(data, r)}` : "Stopped"}
-      amount={money.money(r.amount)} tone={active ? undefined : "muted"}
+    <Cell first={first} title={r.description}
+      subtitle={active ? dot(f.label, nd ? "next " + shortDate(nd) : null, projectName(data, r)) : "Stopped"}
+      value={money.money(r.amount)} tone={active ? undefined : "secondary"}
       onPress={() => nav.navigate("Expense", { id: r.id, recurring: true })} />
   );
 }
 
-export function GroupItem({ g, rg, showMonthly, first }: { g: Group; rg: Range; showMonthly?: boolean; first?: boolean }) {
-  const { data, money } = useStore();
-  const nav = useNavigation<any>();
-  const t = totalsFor(data, groupKeys(data, g.id), rg);
-  return (
-    <Row first={first} lead={<Lead icon="folder-outline" />} title={g.name} sub={plural(itemsIn(data, g.id).length, "item")}
-      amount={money.signed(t.net)} tone={t.net >= 0 ? "gain" : "loss"}
-      amountSub={showMonthly && t.monthly ? `${money.money(t.monthly)}/mo` : undefined}
-      onPress={() => nav.push("GroupDetail", { id: g.id })} />
-  );
-}
-
-export function ItemRow({ p, rg, first }: { p: Item; rg: Range; first?: boolean }) {
-  const { data, money } = useStore();
-  const nav = useNavigation<any>();
-  const t = totalsFor(data, new Set(["p:" + p.id]), rg);
-  return (
-    <Row first={first} lead={<ItemBadge item={p} />} title={p.name}
-      sub={<View style={{ flexDirection: "row", alignItems: "center" }}><StatusDot status={p.status} /><Text style={{ fontFamily: F.body, fontSize: 12.5, color: C.muted }}>{p.status}</Text></View>}
-      amount={money.signed(t.net)} tone={t.net >= 0 ? "gain" : "loss"} amountSub={t.monthly ? `${money.money(t.monthly)}/mo` : undefined}
-      onPress={() => nav.push("ItemDetail", { id: p.id })} />
-  );
-}
-
-export const activeRecurringFor = (d: Snapshot, keys: Set<string>) => d.recurring.filter((r) => keys.has(keyOf(r)) && isActive(r));
-
-/* ---------- adding things ---------- */
+/* ---------- adding ---------- */
 const LIMIT_TEXT: { [k in LimitKind]: string } = {
-  groups: `The free plan includes ${plural(FREE_LIMITS.groups, "project")}. Go Premium for as many as you need.`,
-  items: `The free plan includes ${plural(FREE_LIMITS.items, "item")}. Go Premium for as many as you need.`,
-  recurring: `The free plan includes ${plural(FREE_LIMITS.recurring, "recurring cost")}. Go Premium for as many as you need.`,
+  groups: `The free plan includes ${plural(FREE_LIMITS.items, "project")}.`,
+  items: `The free plan includes ${plural(FREE_LIMITS.items, "project")}.`,
+  recurring: `The free plan includes ${plural(FREE_LIMITS.recurring, "repeating expense")}.`,
 };
-export type AddKind = "sale" | "expense" | "recurring" | "product" | "group" | "item" | "customer";
+export const limitText = (k: LimitKind) => LIMIT_TEXT[k];
 
-// Opens the right form, or the upgrade screen when the free plan's limit is reached.
+export type AddKind = "sale" | "expense" | "product" | "project";
+
+// Opens the right form, or Premium when the free plan's limit is reached.
 export function useAdd() {
   const nav = useNavigation<any>();
   const { canAdd } = usePremium();
   return (kind: AddKind, params: any = {}, replace = false) => {
     const go = (r: string, p: any) => (replace ? nav.replace(r, p) : nav.navigate(r, p));
-    const limit: LimitKind | null = kind === "group" ? "groups" : kind === "item" ? "items" : kind === "recurring" ? "recurring" : null;
-    if (limit && !canAdd(limit)) { go("Paywall", { reason: LIMIT_TEXT[limit] }); return; }
-    const route = { sale: "Sale", expense: "Expense", recurring: "Expense", product: "Product", group: "Group", item: "Item", customer: "Customer" }[kind];
-    go(route, { ...params, recurring: kind === "recurring" || undefined });
+    if (kind === "project" && !canAdd("items")) { go("Paywall", { reason: LIMIT_TEXT.items }); return; }
+    go({ sale: "Sale", expense: "Expense", product: "Product", project: "Project" }[kind], params);
   };
 }
 
-// The + button's menu: a native action sheet on iPhone, a screen elsewhere.
-export function useAddMenu(link?: string) {
+// The + on Home: a native action sheet on iPhone, a small screen elsewhere.
+export function useAddMenu(params: any = {}) {
   const nav = useNavigation<any>();
   const add = useAdd();
+  const c = usePalette();
   return () => {
     tap();
-    const choices: [string, AddKind][] = [["Sale", "sale"], ["Expense", "expense"], ["Recurring cost", "recurring"], ["Product", "product"], ["Project", "group"]];
     if (Platform.OS === "ios") {
       ActionSheetIOS.showActionSheetWithOptions(
-        { options: [...choices.map((c) => c[0]), "Cancel"], cancelButtonIndex: choices.length, userInterfaceStyle: "dark", tintColor: C.ember },
-        (i) => { if (i < choices.length) add(choices[i][1], link ? { link } : {}); },
+        { options: ["Sale", "Expense", "Cancel"], cancelButtonIndex: 2, tintColor: c.accent },
+        (i) => { if (i === 0) add("sale", params); if (i === 1) add("expense", params); },
       );
-    } else nav.navigate("Add", { link });
+    } else nav.navigate("Add", params);
   };
 }
+
+export const activeRecurring = (d: Snapshot, key?: LinkKey) => d.recurring.filter((r) => isActive(r) && (!key || keyOf(r) === key));

@@ -12,9 +12,6 @@
     "test": "node --experimental-strip-types --no-warnings src/lib/logic.test.ts"
   },
   "dependencies": {
-    "@expo-google-fonts/bricolage-grotesque": "*",
-    "@expo-google-fonts/jetbrains-mono": "*",
-    "@expo-google-fonts/manrope": "*",
     "@expo/metro-runtime": "~6.1.2",
     "@expo/vector-icons": "^15.0.2",
     "@react-native-async-storage/async-storage": "2.2.0",

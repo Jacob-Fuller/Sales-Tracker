@@ -1,16 +1,15 @@
+// Building blocks in the style of Apple's own apps: grouped lists, plain rows,
+// a segmented control and form rows with the label on the left.
 import Ionicons from "@expo/vector-icons/Ionicons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Haptics from "expo-haptics";
 import React, { useState } from "react";
 import {
-  Image, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View,
+  Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View,
   type StyleProp, type TextInputProps, type TextStyle, type ViewStyle,
 } from "react-native";
-import type { Period, Totals } from "../lib/calc";
-import { periodLabel } from "../lib/calc";
-import { hue, initials, longDate, parseYmd, STATUS_COLOR, ymd, type Item } from "../lib/model";
-import { useStore } from "../lib/store";
-import { C, F } from "../theme";
+import { longDate, parseYmd, ymd } from "../lib/model";
+import { NUM, usePalette } from "../theme";
 
 export type IconName = React.ComponentProps<typeof Ionicons>["name"];
 export { Ionicons };
@@ -18,158 +17,97 @@ export { Ionicons };
 export const tap = () => { if (Platform.OS === "ios") Haptics.selectionAsync().catch(() => {}); };
 export const success = () => { if (Platform.OS === "ios") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {}); };
 
-/* ---------- text ---------- */
-type TxtProps = { children: React.ReactNode; style?: StyleProp<TextStyle>; numberOfLines?: number };
-export const Txt = ({ children, style, numberOfLines }: TxtProps) => (
-  <Text numberOfLines={numberOfLines} style={[{ fontFamily: F.body, fontSize: 15, color: C.text }, style]}>{children}</Text>
-);
-export const Muted = ({ children, style, numberOfLines }: TxtProps) => (
-  <Text numberOfLines={numberOfLines} style={[{ fontFamily: F.body, fontSize: 13, color: C.muted }, style]}>{children}</Text>
-);
-export const Mono = ({ children, style, numberOfLines }: TxtProps) => (
-  <Text numberOfLines={numberOfLines} style={[{ fontFamily: F.mono, fontSize: 15, color: C.text, fontVariant: ["tabular-nums"] }, style]}>{children}</Text>
-);
-export const Note = ({ children }: { children: React.ReactNode }) => (
-  <Muted style={{ marginHorizontal: 4, fontSize: 13.5, lineHeight: 19 }}>{children}</Muted>
-);
+const HAIR = StyleSheet.hairlineWidth;
 
-/* ---------- screen ---------- */
-// A scrolling screen under the large native title.
-export function Screen({ children, gap = 16 }: { children: React.ReactNode; gap?: number }) {
+/* ---------- screens ---------- */
+export function Screen({ children }: { children: React.ReactNode }) {
+  const c = usePalette();
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: C.bg }}
+      style={{ flex: 1, backgroundColor: c.bg }}
       contentInsetAdjustmentBehavior="automatic"
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="interactive"
       automaticallyAdjustKeyboardInsets
-      contentContainerStyle={{ padding: 16, paddingBottom: 48, gap }}
+      contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 48, gap: 24 }}
     >
       {children}
     </ScrollView>
   );
 }
 
-export function Card({ children, style }: { children: React.ReactNode; style?: StyleProp<ViewStyle> }) {
-  return <View style={[{ backgroundColor: C.surface, borderColor: C.line, borderWidth: 1, borderRadius: 18, overflow: "hidden" }, style]}>{children}</View>;
-}
-
-export function SectionHead({ title, meta, action }: { title: string; meta?: string; action?: { label: string; onPress: () => void } }) {
+/* ---------- grouped sections ---------- */
+export function Section({ title, right, footer, children }: { title?: string; right?: string; footer?: string; children: React.ReactNode }) {
+  const c = usePalette();
+  const kids = React.Children.toArray(children).filter(Boolean) as React.ReactElement<any>[];
+  if (!kids.length) return null;
   return (
-    <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", marginHorizontal: 4, marginTop: 8, marginBottom: -6, gap: 12 }}>
-      <Text style={{ fontFamily: F.displayBold, fontSize: 18, color: C.text }}>{title}</Text>
-      {meta ? <Mono style={{ color: C.muted, fontSize: 13, fontFamily: F.monoMedium }}>{meta}</Mono> : null}
-      {action ? <Pressable hitSlop={10} onPress={action.onPress} accessibilityRole="button"><Text style={{ fontFamily: F.bold, color: C.ember, fontSize: 14 }}>{action.label}</Text></Pressable> : null}
-    </View>
-  );
-}
-
-export function MonthHead({ label, total }: { label: string; total: string }) {
-  return (
-    <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 4, marginTop: 6, marginBottom: -8 }}>
-      <Text style={{ fontFamily: F.bold, color: C.muted, fontSize: 13 }}>{label}</Text>
-      <Mono style={{ color: C.muted, fontSize: 13, fontFamily: F.monoMedium }}>{total}</Mono>
-    </View>
-  );
-}
-
-/* ---------- list rows ---------- */
-export function Row({ lead, title, sub, amount, tone, amountSub, onPress, first, chevron }: {
-  lead?: React.ReactNode; title: string; sub?: React.ReactNode; amount?: string; tone?: "gain" | "loss" | "muted";
-  amountSub?: string; onPress?: () => void; first?: boolean; chevron?: boolean;
-}) {
-  return (
-    <Pressable
-      accessibilityRole={onPress ? "button" : undefined}
-      onPress={onPress}
-      disabled={!onPress}
-      style={({ pressed }) => ({
-        flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 13, paddingHorizontal: 16,
-        borderTopWidth: first ? 0 : StyleSheet.hairlineWidth, borderTopColor: C.lineStrong,
-        backgroundColor: pressed ? "rgba(255,255,255,0.04)" : "transparent",
-      })}
-    >
-      {lead}
-      <View style={{ flex: 1, minWidth: 0 }}>
-        <Text numberOfLines={1} style={{ fontFamily: F.bold, fontSize: 15.5, color: C.text }}>{title}</Text>
-        {sub == null ? null : typeof sub === "string"
-          ? <Text numberOfLines={1} style={{ fontFamily: F.body, fontSize: 12.5, color: C.muted, marginTop: 2 }}>{sub}</Text>
-          : <View style={{ marginTop: 2 }}>{sub}</View>}
-      </View>
-      {amount != null ? (
-        <View style={{ alignItems: "flex-end" }}>
-          <Mono style={{ color: tone === "gain" ? C.gain : tone === "loss" ? C.loss : tone === "muted" ? C.muted : C.text }}>{amount}</Mono>
-          {amountSub ? <Text style={{ fontFamily: F.body, fontSize: 11.5, color: C.muted, marginTop: 2 }}>{amountSub}</Text> : null}
+    <View>
+      {title ? (
+        <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 16, marginBottom: 7 }}>
+          <Text style={{ fontSize: 13, color: c.secondary, textTransform: "uppercase", letterSpacing: 0.2 }}>{title}</Text>
+          {right ? <Text style={[{ fontSize: 13, color: c.secondary }, NUM]}>{right}</Text> : null}
         </View>
       ) : null}
-      {chevron ? <Ionicons name="chevron-forward" size={17} color={C.faint} /> : null}
+      <View style={{ backgroundColor: c.card, borderRadius: 12, overflow: "hidden" }}>
+        {kids.map((k, i) => React.cloneElement(k, { first: i === 0 }))}
+      </View>
+      {footer ? <Text style={{ fontSize: 13, color: c.secondary, paddingHorizontal: 16, marginTop: 7, lineHeight: 18 }}>{footer}</Text> : null}
+    </View>
+  );
+}
+
+// A small coloured square with a white symbol, like the Settings app.
+export function Tile({ icon, color, size = 30 }: { icon: IconName; color: string; size?: number }) {
+  return (
+    <View style={{ width: size, height: size, borderRadius: size * 0.24, backgroundColor: color, alignItems: "center", justifyContent: "center" }}>
+      <Ionicons name={icon} size={size * 0.6} color="#FFFFFF" />
+    </View>
+  );
+}
+
+export function Cell({ title, subtitle, value, tone, lead, onPress, chevron, first, accent, destructive, center }: {
+  title: string; subtitle?: string; value?: string; tone?: "gain" | "loss" | "secondary";
+  lead?: React.ReactNode; onPress?: () => void; chevron?: boolean; first?: boolean;
+  accent?: boolean; destructive?: boolean; center?: boolean;
+}) {
+  const c = usePalette();
+  const titleColor = destructive ? c.loss : accent ? c.accent : c.text;
+  const valueColor = tone === "gain" ? c.gain : tone === "loss" ? c.loss : tone === "secondary" ? c.secondary : c.text;
+  return (
+    <Pressable accessibilityRole={onPress ? "button" : undefined} disabled={!onPress} onPress={onPress}
+      style={({ pressed }) => ({ backgroundColor: pressed ? c.pressed : c.card, flexDirection: "row", alignItems: "center", paddingLeft: 16 })}>
+      {lead ? <View style={{ marginRight: 12 }}>{lead}</View> : null}
+      <View style={{
+        flex: 1, flexDirection: "row", alignItems: "center", minHeight: subtitle ? 58 : 46, paddingVertical: 9, paddingRight: 14,
+        borderTopWidth: first ? 0 : HAIR, borderTopColor: c.separator, gap: 10,
+      }}>
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text numberOfLines={1} style={{ fontSize: 17, color: titleColor, textAlign: center ? "center" : "left" }}>{title}</Text>
+          {subtitle ? <Text numberOfLines={1} style={{ fontSize: 14, color: c.secondary, marginTop: 2 }}>{subtitle}</Text> : null}
+        </View>
+        {value != null ? <Text numberOfLines={1} style={[{ fontSize: 17, color: valueColor, maxWidth: "55%" }, NUM]}>{value}</Text> : null}
+        {chevron ? <Ionicons name="chevron-forward" size={18} color={c.tertiary} /> : null}
+      </View>
     </Pressable>
   );
 }
 
-// Rows inside one card, with dividers between them.
-export function List({ children }: { children: React.ReactNode }) {
-  const kids = React.Children.toArray(children).filter(Boolean) as React.ReactElement<any>[];
-  return <Card>{kids.map((k, i) => React.cloneElement(k, { first: i === 0 }))}</Card>;
-}
-
-export function AddRow({ text, onPress, first }: { text: string; onPress: () => void; first?: boolean }) {
+/* ---------- segmented control ---------- */
+export function Segmented<T extends string>({ value, options, onChange }: { value: T; options: { value: T; label: string }[]; onChange: (v: T) => void }) {
+  const c = usePalette();
   return (
-    <Pressable accessibilityRole="button" onPress={onPress}
-      style={({ pressed }) => ({
-        flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 13, paddingHorizontal: 16,
-        borderTopWidth: first ? 0 : StyleSheet.hairlineWidth, borderTopColor: C.lineStrong, backgroundColor: pressed ? "rgba(255,255,255,0.04)" : "transparent",
-      })}>
-      <Lead icon="add" tone="ember" />
-      <Text style={{ fontFamily: F.bold, fontSize: 15.5, color: C.ember }}>{text}</Text>
-    </Pressable>
-  );
-}
-
-/* ---------- leading badges ---------- */
-const TONES = {
-  plain: { bg: C.surface2, fg: C.muted },
-  sale: { bg: C.gainSoft, fg: C.gain },
-  exp: { bg: C.lossSoft, fg: C.loss },
-  recur: { bg: C.recurSoft, fg: C.recur },
-  ember: { bg: C.emberSoft, fg: C.ember },
-};
-export function Lead({ icon, tone = "plain", size = 36 }: { icon: IconName; tone?: keyof typeof TONES; size?: number }) {
-  const t = TONES[tone];
-  return (
-    <View style={{ width: size, height: size, borderRadius: size * 0.31, backgroundColor: t.bg, alignItems: "center", justifyContent: "center" }}>
-      <Ionicons name={icon} size={size * 0.48} color={t.fg} />
-    </View>
-  );
-}
-export function Letters({ text, h, size = 36 }: { text: string; h: number; size?: number }) {
-  return (
-    <View style={{ width: size, height: size, borderRadius: size * 0.31, backgroundColor: `hsl(${h}, 40%, 20%)`, alignItems: "center", justifyContent: "center" }}>
-      <Text style={{ fontFamily: F.display, fontSize: size * 0.36, color: `hsl(${h}, 85%, 74%)` }}>{text}</Text>
-    </View>
-  );
-}
-export const Avatar = ({ name }: { name: string }) => <Letters text={initials(name)} h={hue(name)} />;
-export function ItemBadge({ item, size = 36 }: { item: Pick<Item, "name" | "logo" | "iconText" | "iconHue">; size?: number }) {
-  if (item.logo) return <Image source={{ uri: item.logo }} style={{ width: size, height: size, borderRadius: size * 0.28 }} />;
-  const text = (item.iconText || initials(item.name || "?")).slice(0, 3);
-  return <Letters text={text} h={item.iconHue ?? hue(item.name || "")} size={size} />;
-}
-export const StatusDot = ({ status }: { status: string }) => (
-  <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: STATUS_COLOR[status] || C.faint, marginRight: 6, marginTop: 1 }} />
-);
-
-/* ---------- money summary ---------- */
-export function Pills({ value, onChange, fyStartMonth }: { value: Period; onChange: (p: Period) => void; fyStartMonth: number }) {
-  const opts: Period[] = ["month", "fy", "all"];
-  return (
-    <View accessibilityRole="tablist" style={{ flexDirection: "row", gap: 6, flexWrap: "wrap" }}>
-      {opts.map((p) => {
-        const on = p === value;
+    <View accessibilityRole="tablist" style={{ flexDirection: "row", backgroundColor: c.fill, borderRadius: 9, padding: 2 }}>
+      {options.map((o) => {
+        const on = o.value === value;
         return (
-          <Pressable key={p} accessibilityRole="tab" accessibilityState={{ selected: on }} onPress={() => { tap(); onChange(p); }}
-            style={{ backgroundColor: on ? C.text : C.surface, paddingVertical: 7, paddingHorizontal: 14, borderRadius: 999 }}>
-            <Text style={{ fontFamily: F.bold, fontSize: 13, color: on ? C.bg : C.muted }}>{periodLabel(p, fyStartMonth)}</Text>
+          <Pressable key={o.value} accessibilityRole="tab" accessibilityState={{ selected: on }} onPress={() => { if (!on) { tap(); onChange(o.value); } }}
+            style={{
+              flex: 1, alignItems: "center", paddingVertical: 6, borderRadius: 7,
+              backgroundColor: on ? (c.dark ? "#636366" : "#FFFFFF") : "transparent",
+              shadowColor: "#000", shadowOpacity: on && !c.dark ? 0.12 : 0, shadowRadius: 3, shadowOffset: { width: 0, height: 1 },
+            }}>
+            <Text numberOfLines={1} style={{ fontSize: 13, fontWeight: on ? "600" : "500", color: c.text }}>{o.label}</Text>
           </Pressable>
         );
       })}
@@ -177,192 +115,214 @@ export function Pills({ value, onChange, fyStartMonth }: { value: Period; onChan
   );
 }
 
-export function Hero({ t, label = "Profit" }: { t: Totals; label?: string }) {
-  const { money } = useStore();
+/* ---------- the profit summary ---------- */
+export function Summary({ net, moneyIn, moneyOut, label = "Profit" }: { net: string; moneyIn: string; moneyOut: string; label?: string; negative?: boolean }) {
+  const c = usePalette();
   return (
-    <Card style={{ padding: 22 }}>
-      <Text style={{ fontFamily: F.semi, fontSize: 13.5, color: C.muted }}>{label}</Text>
-      <Text adjustsFontSizeToFit numberOfLines={1}
-        style={{ fontFamily: F.mono, fontSize: 38, letterSpacing: -1, marginTop: 6, marginBottom: 14, color: t.net >= 0 ? C.gain : C.loss, fontVariant: ["tabular-nums"] }}>
-        {money.signed(t.net)}
-      </Text>
-      <View style={{ flexDirection: "row", gap: 28 }}>
-        <Stat label="Money in" value={money.money(t.kept)} />
-        <Stat label="Money out" value={money.money(t.spent)} />
+    <View style={{ backgroundColor: c.card, borderRadius: 12, padding: 18 }}>
+      <Text style={{ fontSize: 15, color: c.secondary }}>{label}</Text>
+      <Text adjustsFontSizeToFit numberOfLines={1} style={[{ fontSize: 40, fontWeight: "700", letterSpacing: -0.8, color: net.startsWith("-") ? c.loss : c.text, marginTop: 2 }, NUM]}>{net}</Text>
+      <View style={{ flexDirection: "row", marginTop: 14, paddingTop: 14, borderTopWidth: HAIR, borderTopColor: c.separator }}>
+        <Figure label="Money in" value={moneyIn} />
+        <View style={{ width: HAIR, backgroundColor: c.separator, marginHorizontal: 16 }} />
+        <Figure label="Money out" value={moneyOut} />
       </View>
-      <View style={{ marginTop: 18, paddingTop: 14, borderTopWidth: 1, borderTopColor: C.line, flexDirection: "row", justifyContent: "space-between" }}>
-        <Muted style={{ fontSize: 14 }}>Recurring costs</Muted>
-        <Mono style={{ fontSize: 14 }}>{money.money(t.monthly)}/mo</Mono>
-      </View>
-    </Card>
+    </View>
   );
 }
-const Stat = ({ label, value }: { label: string; value: string }) => (
-  <View>
-    <Text style={{ fontFamily: F.semi, fontSize: 12.5, color: C.muted }}>{label}</Text>
-    <Mono style={{ fontSize: 17, marginTop: 2 }}>{value}</Mono>
-  </View>
-);
-
-export function Empty({ title, text, button }: { title: string; text: string; button?: { label: string; onPress: () => void } }) {
+function Figure({ label, value }: { label: string; value: string }) {
+  const c = usePalette();
   return (
-    <Card style={{ alignItems: "center", paddingVertical: 36, paddingHorizontal: 20, gap: 12 }}>
-      <Text style={{ fontFamily: F.display, fontSize: 19, color: C.text }}>{title}</Text>
-      <Muted style={{ fontSize: 14.5, textAlign: "center", maxWidth: 280, lineHeight: 20 }}>{text}</Muted>
-      {button ? <Button title={button.label} icon="add" onPress={button.onPress} style={{ marginTop: 4 }} /> : null}
-    </Card>
+    <View style={{ flex: 1 }}>
+      <Text style={{ fontSize: 13, color: c.secondary }}>{label}</Text>
+      <Text adjustsFontSizeToFit numberOfLines={1} style={[{ fontSize: 20, fontWeight: "600", color: c.text, marginTop: 2 }, NUM]}>{value}</Text>
+    </View>
+  );
+}
+
+/* ---------- empty states ---------- */
+export function Empty({ icon, title, text, button }: { icon: IconName; title: string; text?: string; button?: { label: string; onPress: () => void } }) {
+  const c = usePalette();
+  return (
+    <View style={{ alignItems: "center", paddingTop: 72, paddingHorizontal: 24, gap: 8 }}>
+      <Ionicons name={icon} size={46} color={c.tertiary} />
+      <Text style={{ fontSize: 20, fontWeight: "600", color: c.text, marginTop: 6, textAlign: "center" }}>{title}</Text>
+      {text ? <Text style={{ fontSize: 15, color: c.secondary, textAlign: "center", lineHeight: 20, maxWidth: 300 }}>{text}</Text> : null}
+      {button ? <Button title={button.label} onPress={button.onPress} style={{ marginTop: 14, alignSelf: "center", paddingHorizontal: 24 }} /> : null}
+    </View>
   );
 }
 
 /* ---------- buttons ---------- */
-export function Button({ title, onPress, kind = "primary", icon, disabled, style }: {
-  title: string; onPress: () => void; kind?: "primary" | "soft" | "danger"; icon?: IconName; disabled?: boolean; style?: StyleProp<ViewStyle>;
-}) {
-  const bg = kind === "primary" ? C.ember : kind === "soft" ? C.surface2 : "transparent";
-  const fg = kind === "primary" ? C.emberInk : kind === "soft" ? C.text : C.loss;
+export function Button({ title, onPress, disabled, plain, style }: { title: string; onPress: () => void; disabled?: boolean; plain?: boolean; style?: StyleProp<ViewStyle> }) {
+  const c = usePalette();
   return (
     <Pressable accessibilityRole="button" disabled={disabled} onPress={onPress}
       style={({ pressed }) => [{
-        flexDirection: "row", gap: 8, alignItems: "center", justifyContent: "center", paddingVertical: 13, paddingHorizontal: 18, borderRadius: 13,
-        backgroundColor: bg, borderWidth: kind === "danger" ? 1 : 0, borderColor: "rgba(251,113,133,0.35)", opacity: disabled ? 0.5 : pressed ? 0.85 : 1,
+        alignItems: "center", justifyContent: "center", paddingVertical: 14, paddingHorizontal: 18, borderRadius: 12,
+        backgroundColor: plain ? c.card : c.accent, opacity: disabled ? 0.45 : pressed ? 0.8 : 1,
       }, style]}>
-      {icon ? <Ionicons name={icon} size={18} color={fg} /> : null}
-      <Text style={{ fontFamily: F.bold, fontSize: 15, color: fg }}>{title}</Text>
+      <Text style={{ fontSize: 17, fontWeight: "600", color: plain ? c.accent : c.onAccent }}>{title}</Text>
     </Pressable>
   );
 }
 
-export function HeaderButton({ icon, label, onPress, primary, disabled }: { icon?: IconName; label?: string; onPress: () => void; primary?: boolean; disabled?: boolean }) {
-  if (icon) {
-    return (
-      <Pressable accessibilityRole="button" accessibilityLabel={label} hitSlop={8} onPress={onPress}
-        style={({ pressed }) => ({
-          width: 34, height: 34, borderRadius: 17, alignItems: "center", justifyContent: "center",
-          backgroundColor: primary ? C.ember : C.surface2, opacity: pressed ? 0.8 : 1,
-        })}>
-        <Ionicons name={icon} size={primary ? 22 : 19} color={primary ? C.emberInk : C.text} />
-      </Pressable>
-    );
-  }
+export function HeaderIcon({ icon, label, onPress }: { icon: IconName; label: string; onPress: () => void }) {
+  const c = usePalette();
   return (
-    <Pressable accessibilityRole="button" hitSlop={10} onPress={onPress} disabled={disabled}>
-      <Text style={{ fontFamily: primary ? F.bold : F.semi, fontSize: 16.5, color: disabled ? C.faint : primary ? C.ember : C.text }}>{label}</Text>
+    <Pressable accessibilityRole="button" accessibilityLabel={label} hitSlop={10} onPress={onPress}
+      style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1, paddingHorizontal: 4 })}>
+      <Ionicons name={icon} size={icon === "add" ? 30 : 24} color={c.accent} />
     </Pressable>
   );
 }
 
-/* ---------- form pieces ---------- */
-export function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+export function HeaderText({ label, onPress, bold, disabled }: { label: string; onPress: () => void; bold?: boolean; disabled?: boolean }) {
+  const c = usePalette();
   return (
-    <View style={{ gap: 6 }}>
-      <Text style={{ fontFamily: F.bold, fontSize: 13, color: C.muted }}>{label}</Text>
-      {children}
-      {hint ? <Text style={{ fontFamily: F.body, fontSize: 12, color: C.faint }}>{hint}</Text> : null}
+    <Pressable accessibilityRole="button" hitSlop={10} onPress={onPress} disabled={disabled}
+      style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1, paddingHorizontal: 4 })}>
+      <Text style={{ fontSize: 17, fontWeight: bold ? "600" : "400", color: disabled ? c.tertiary : c.accent }}>{label}</Text>
+    </Pressable>
+  );
+}
+
+/* ---------- form rows (label on the left, value on the right) ---------- */
+function FormRow({ label, first, children, onPress, tall }: { label: string; first?: boolean; children: React.ReactNode; onPress?: () => void; tall?: boolean }) {
+  const c = usePalette();
+  return (
+    <Pressable disabled={!onPress} onPress={onPress} accessibilityRole={onPress ? "button" : undefined}
+      style={({ pressed }) => ({ backgroundColor: pressed && onPress ? c.pressed : c.card, paddingLeft: 16 })}>
+      <View style={{
+        flexDirection: "row", alignItems: "center", minHeight: tall ? 56 : 46, paddingRight: 16, gap: 12,
+        borderTopWidth: first ? 0 : HAIR, borderTopColor: c.separator,
+      }}>
+        <Text style={{ fontSize: 17, color: c.text }}>{label}</Text>
+        <View style={{ flex: 1, alignItems: "flex-end" }}>{children}</View>
+      </View>
+    </Pressable>
+  );
+}
+
+export function TextRow({ label, first, money, style, ...rest }: TextInputProps & { label: string; first?: boolean; money?: boolean }) {
+  const c = usePalette();
+  return (
+    <FormRow label={label} first={first}>
+      <TextInput
+        placeholderTextColor={c.tertiary}
+        selectionColor={c.accent}
+        keyboardAppearance={c.dark ? "dark" : "light"}
+        {...rest}
+        style={[{ fontSize: 17, color: c.text, textAlign: "right", paddingVertical: 11, width: "100%", outlineWidth: 0 } as TextStyle, money ? NUM : null, style]}
+      />
+    </FormRow>
+  );
+}
+
+// A large amount entry at the top of a form.
+export function AmountField({ value, onChangeText, symbol, autoFocus }: { value: string; onChangeText: (v: string) => void; symbol: string; autoFocus?: boolean }) {
+  const c = usePalette();
+  return (
+    <View style={{ backgroundColor: c.card, borderRadius: 12, paddingVertical: 18, paddingHorizontal: 16, flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+      <Text style={{ fontSize: 34, fontWeight: "600", color: value ? c.text : c.tertiary }}>{symbol}</Text>
+      <TextInput value={value} onChangeText={onChangeText} placeholder="0.00" placeholderTextColor={c.tertiary} keyboardType="decimal-pad"
+        autoFocus={autoFocus} selectionColor={c.accent} keyboardAppearance={c.dark ? "dark" : "light"} accessibilityLabel="Amount"
+        style={[{ fontSize: 34, fontWeight: "600", color: c.text, minWidth: 90, paddingVertical: 0, outlineWidth: 0 } as TextStyle, NUM]} />
     </View>
   );
 }
 
-const inputStyle: TextStyle = {
-  borderWidth: 1, borderColor: C.lineStrong, backgroundColor: C.surface, color: C.text, borderRadius: 13,
-  paddingHorizontal: 14, paddingVertical: Platform.OS === "ios" ? 13 : 10, fontSize: 16, fontFamily: F.body,
-};
+export type Option = { value: string; label: string };
 
-export function Input(props: TextInputProps & { amount?: boolean }) {
-  const { amount, style, ...rest } = props;
-  const [focus, setFocus] = useState(false);
-  return (
-    <TextInput
-      placeholderTextColor={C.faint}
-      selectionColor={C.ember}
-      keyboardAppearance="dark"
-      {...rest}
-      onFocus={(e) => { setFocus(true); rest.onFocus && rest.onFocus(e); }}
-      onBlur={(e) => { setFocus(false); rest.onBlur && rest.onBlur(e); }}
-      style={[inputStyle, focus && { borderColor: C.ember }, amount && { fontFamily: F.mono, fontSize: 22 }, style]}
-    />
-  );
-}
-
-export type Option = { value: string; label: string; section?: string };
-// A select that opens a list of choices in place (works inside sheets).
-export function Select({ value, options, onChange, placeholder }: { value: string; options: Option[]; onChange: (v: string) => void; placeholder?: string }) {
+// Tapping the row opens the choices right under it, checkmark on the current one.
+export function PickerRow({ label, value, options, onChange, first, disabled }: {
+  label: string; value: string; options: Option[]; onChange: (v: string) => void; first?: boolean; disabled?: boolean;
+}) {
+  const c = usePalette();
   const [open, setOpen] = useState(false);
   const cur = options.find((o) => o.value === value);
-  let lastSection: string | undefined;
   return (
     <View>
-      <Pressable accessibilityRole="button" accessibilityState={{ expanded: open }} onPress={() => { tap(); setOpen((o) => !o); }}
-        style={[inputStyle, { flexDirection: "row", alignItems: "center", gap: 8 }, open && { borderColor: C.ember }]}>
-        <Text numberOfLines={1} style={{ flex: 1, fontFamily: F.body, fontSize: 16, color: cur ? C.text : C.faint }}>{cur ? cur.label : placeholder || "Choose"}</Text>
-        <Ionicons name={open ? "chevron-up" : "chevron-down"} size={16} color={C.muted} />
-      </Pressable>
-      {open ? (
-        <Card style={{ marginTop: 6 }}>
-          {options.map((o, i) => {
-            const head = o.section && o.section !== lastSection ? o.section : null;
-            lastSection = o.section;
-            const on = o.value === value;
-            return (
-              <View key={o.value}>
-                {head ? <Text style={{ fontFamily: F.bold, fontSize: 12, color: C.faint, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 4, textTransform: "uppercase", letterSpacing: 0.6 }}>{head}</Text> : null}
-                <Pressable accessibilityRole="button" accessibilityState={{ selected: on }} onPress={() => { tap(); onChange(o.value); setOpen(false); }}
-                  style={({ pressed }) => ({
-                    flexDirection: "row", alignItems: "center", paddingVertical: 12, paddingHorizontal: 16, gap: 10,
-                    borderTopWidth: i === 0 || head ? 0 : StyleSheet.hairlineWidth, borderTopColor: C.lineStrong,
-                    backgroundColor: pressed ? "rgba(255,255,255,0.04)" : "transparent",
-                  })}>
-                  <Text numberOfLines={1} style={{ flex: 1, fontFamily: on ? F.bold : F.body, fontSize: 15.5, color: on ? C.ember : C.text }}>{o.label}</Text>
-                  {on ? <Ionicons name="checkmark" size={18} color={C.ember} /> : null}
-                </Pressable>
-              </View>
-            );
-          })}
-        </Card>
-      ) : null}
+      <FormRow label={label} first={first} onPress={disabled ? undefined : () => { tap(); setOpen((o) => !o); }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+          <Text numberOfLines={1} style={{ fontSize: 17, color: open ? c.accent : c.secondary, maxWidth: 220 }}>{cur ? cur.label : "None"}</Text>
+          {disabled ? null : <Ionicons name="chevron-expand" size={16} color={open ? c.accent : c.tertiary} />}
+        </View>
+      </FormRow>
+      {open ? options.map((o) => {
+        const on = o.value === value;
+        return (
+          <Pressable key={o.value} accessibilityRole="button" accessibilityState={{ selected: on }}
+            onPress={() => { tap(); onChange(o.value); setOpen(false); }}
+            style={({ pressed }) => ({ backgroundColor: pressed ? c.pressed : c.card, paddingLeft: 32 })}>
+            <View style={{ flexDirection: "row", alignItems: "center", minHeight: 44, paddingRight: 16, borderTopWidth: HAIR, borderTopColor: c.separator }}>
+              <Text numberOfLines={1} style={{ flex: 1, fontSize: 17, color: c.text }}>{o.label}</Text>
+              {on ? <Ionicons name="checkmark" size={20} color={c.accent} /> : null}
+            </View>
+          </Pressable>
+        );
+      }) : null}
     </View>
   );
 }
 
-// The phone's own date picker ("YYYY-MM-DD" in and out).
-export function DateInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+export function DateRow({ label = "Date", value, onChange, first }: { label?: string; value: string; onChange: (v: string) => void; first?: boolean }) {
+  const c = usePalette();
   const [open, setOpen] = useState(false);
-  if (Platform.OS === "web") return <Input value={value} onChangeText={onChange} placeholder="2026-01-31" />;
   if (Platform.OS === "ios") {
     return (
-      <View style={{ flexDirection: "row" }}>
-        <DateTimePicker mode="date" display="compact" value={parseYmd(value)} themeVariant="dark" accentColor={C.ember}
+      <FormRow label={label} first={first}>
+        <DateTimePicker mode="date" display="compact" value={parseYmd(value)} themeVariant={c.dark ? "dark" : "light"} accentColor={c.accent}
           onChange={(_, d) => { if (d) onChange(ymd(d)); }} />
-      </View>
+      </FormRow>
+    );
+  }
+  if (Platform.OS === "web") {
+    return (
+      <FormRow label={label} first={first}>
+        <Text style={{ fontSize: 17, color: c.secondary }}>{longDate(value)}</Text>
+      </FormRow>
     );
   }
   return (
-    <View>
-      <Pressable accessibilityRole="button" onPress={() => setOpen(true)} style={inputStyle}>
-        <Text style={{ fontFamily: F.body, fontSize: 16, color: C.text }}>{longDate(value)}</Text>
-      </Pressable>
+    <>
+      <FormRow label={label} first={first} onPress={() => setOpen(true)}>
+        <Text style={{ fontSize: 17, color: c.secondary }}>{longDate(value)}</Text>
+      </FormRow>
       {open ? <DateTimePicker mode="date" value={parseYmd(value)} onChange={(e, d) => { setOpen(false); if (e.type === "set" && d) onChange(ymd(d)); }} /> : null}
-    </View>
+    </>
   );
 }
 
-export function More({ children, startOpen }: { children: React.ReactNode; startOpen?: boolean }) {
-  const [open, setOpen] = useState(!!startOpen);
+export function StepperRow({ label, value, onChange, min = 1, first }: { label: string; value: number; onChange: (n: number) => void; min?: number; first?: boolean }) {
+  const c = usePalette();
+  const btn = (icon: IconName, d: number, off: boolean) => (
+    <Pressable accessibilityRole="button" accessibilityLabel={d > 0 ? "More" : "Fewer"} disabled={off} hitSlop={6}
+      onPress={() => { tap(); onChange(value + d); }}
+      style={({ pressed }) => ({ width: 44, height: 32, alignItems: "center", justifyContent: "center", opacity: off ? 0.3 : pressed ? 0.5 : 1 })}>
+      <Ionicons name={icon} size={20} color={c.text} />
+    </Pressable>
+  );
   return (
-    <View style={{ borderTopWidth: 1, borderTopColor: C.line, paddingTop: 12, gap: 14 }}>
-      <Pressable accessibilityRole="button" accessibilityState={{ expanded: open }} onPress={() => { tap(); setOpen((o) => !o); }} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-        <Ionicons name={open ? "remove" : "add"} size={16} color={C.ember} />
-        <Text style={{ fontFamily: F.bold, fontSize: 14, color: C.muted }}>More options</Text>
-      </Pressable>
-      {open ? children : null}
-    </View>
+    <FormRow label={label} first={first}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+        <Text style={[{ fontSize: 17, color: c.secondary, minWidth: 24, textAlign: "right" }, NUM]}>{value}</Text>
+        <View style={{ flexDirection: "row", backgroundColor: c.fill, borderRadius: 9, alignItems: "center" }}>
+          {btn("remove", -1, value <= min)}
+          <View style={{ width: HAIR, height: 18, backgroundColor: c.tertiary }} />
+          {btn("add", 1, false)}
+        </View>
+      </View>
+    </FormRow>
   );
 }
 
-// Form screen body: fields stacked with even spacing, inside a sheet.
+// Form screen body inside a sheet.
 export function Form({ children }: { children: React.ReactNode }) {
+  const c = usePalette();
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: C.bg }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive"
-      automaticallyAdjustKeyboardInsets contentContainerStyle={{ padding: 16, paddingBottom: 60, gap: 16 }}>
+    <ScrollView style={{ flex: 1, backgroundColor: c.bg }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive"
+      automaticallyAdjustKeyboardInsets contentContainerStyle={{ padding: 16, paddingBottom: 60, gap: 24 }}>
       {children}
     </ScrollView>
   );
