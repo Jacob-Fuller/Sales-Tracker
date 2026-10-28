@@ -30,7 +30,7 @@
     },
     "android": {
       "package": "au.profitpocket.app",
-      "adaptiveIcon": { "foregroundImage": "./assets/adaptive-icon.png", "backgroundColor": "#22233B" }
+      "adaptiveIcon": { "foregroundImage": "./assets/adaptive-icon.png", "backgroundColor": "#0D0C14" }
     },
     "web": { "favicon": "./assets/favicon.png" },
     "plugins": [
