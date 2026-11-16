@@ -106,7 +106,7 @@ slides = {}
 pano = backdrop(2 * W, H, 1290, 1250, 1)
 icon = f'<img class="tile" src="{uri(ICON)}" style="left:110px;top:150px;width:200px;height:200px"/>' if ICON else ""
 body12 = pano + icon
-body12 += head("Abacus Board", "Know what you <em>really</em> make.", top=420, width=1070)
+body12 += head("Accounting Board", "Know what you <em>really</em> make.", top=420, width=1070)
 body12 += head("Fees counted", "Store cuts taken off. <em>Every sale.</em>", left=W + 110, top=230, width=1070)
 body12 += phone("light-home", 1010, 790, 1180, rot=-9, z=2)
 body12 += card(row("Soy Candle", "Etsy · 10% fee taken off", "+$22.68", "gain"), W + 330, 1020, 860, rot=3, z=6)

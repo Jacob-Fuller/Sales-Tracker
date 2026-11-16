@@ -1,4 +1,4 @@
-# Builds the Abacus Board iPhone app (mobile/) on Codemagic's Macs and uploads
+# Builds the Accounting Board iPhone app (mobile/) on Codemagic's Macs and uploads
 # it to TestFlight, the same way as the native Wisebyte app. No Mac needed.
 # Every push to main that changes mobile/ (or this file) builds and uploads a
 # new TestFlight build automatically.
