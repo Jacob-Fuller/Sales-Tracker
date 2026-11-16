@@ -3,15 +3,19 @@ export type Money = {
   money: (n: number) => string;
   signed: (n: number) => string;
   compact: (n: number) => string;
+  whole: (n: number) => string; // no cents, for small stat cells
   symbol: string;
 };
 
 const cache: { [k: string]: Money } = {};
 
-export function makeMoney(currency: string): Money {
-  if (cache[currency]) return cache[currency];
-  let nf: Intl.NumberFormat | null = null;
+// hide: amounts show as dots (the eye button), so the app can be opened in front of people.
+export function makeMoney(currency: string, hide = false): Money {
+  const ck = currency + (hide ? ":h" : "");
+  if (cache[ck]) return cache[ck];
+  let nf: Intl.NumberFormat | null = null, nf0: Intl.NumberFormat | null = null;
   try { nf = new Intl.NumberFormat(undefined, { style: "currency", currency }); } catch {}
+  try { nf0 = new Intl.NumberFormat(undefined, { style: "currency", currency, maximumFractionDigits: 0, minimumFractionDigits: 0 }); } catch {}
   const plain = (n: number) => Math.abs(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   const fmtAbs = (n: number) => {
     const v = Math.abs(Number(n) || 0);
@@ -20,8 +24,16 @@ export function makeMoney(currency: string): Money {
   };
   let symbol = "$";
   try { symbol = fmtAbs(0).replace(/[\d.,\s  ]/g, "") || "$"; } catch {}
-  const m: Money = {
+  const dots = () => symbol + "•••";
+  const whole = (n: number) => {
+    const v = Math.round(Math.abs(Number(n) || 0));
+    let out = symbol + String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    if (nf0) { try { out = nf0.format(v); } catch {} }
+    return (n <= -0.5 ? "-" : "") + out;
+  };
+  const m: Money = hide ? { money: dots, signed: dots, compact: dots, whole: dots, symbol } : {
     money: fmtAbs,
+    whole,
     signed: (n) => (n < 0 ? "-" : "") + fmtAbs(n),
     compact: (n) => {
       const v = Math.abs(n);
@@ -30,7 +42,7 @@ export function makeMoney(currency: string): Money {
     },
     symbol,
   };
-  cache[currency] = m;
+  cache[ck] = m;
   return m;
 }
 

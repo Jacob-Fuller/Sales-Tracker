@@ -1,21 +1,21 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { DarkTheme, DefaultTheme, NavigationContainer, useNavigation } from "@react-navigation/native";
+import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator, type NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { Platform, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { useAdd, useAddMenu } from "./src/components/rows";
-import { HeaderIcon, HeaderText, Ionicons, type IconName } from "./src/components/ui";
+import { HeaderText, Ionicons, type IconName } from "./src/components/ui";
 import { PremiumProvider } from "./src/lib/premium";
 import { StoreProvider, useStore } from "./src/lib/store";
 import { ExpenseForm, ProductForm, ProjectForm, SaleForm } from "./src/screens/Forms";
 import { HomeScreen, ProjectDetailScreen } from "./src/screens/HomeScreens";
+import { InsightsScreen } from "./src/screens/InsightsScreen";
 import { AddScreen, ExpensesScreen, ProductsScreen, ProjectsScreen, SalesScreen } from "./src/screens/ListScreens";
 import { AccountScreen, CategoriesScreen, ChannelsScreen, PaywallScreen, SettingsScreen } from "./src/screens/SettingsScreens";
 import { TaxReportScreen } from "./src/screens/TaxReportScreen";
-import { usePalette, type Palette } from "./src/theme";
+import { AppearanceContext, usePalette, type Palette } from "./src/theme";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -52,21 +52,14 @@ function sheetOptions(c: Palette): NativeStackNavigationOptions {
   };
 }
 
-const HomeAdd = () => { const menu = useAddMenu(); return <HeaderIcon icon="add" label="Add" onPress={menu} />; };
-const SaleAdd = () => { const add = useAdd(); return <HeaderIcon icon="add" label="Add Sale" onPress={() => add("sale")} />; };
-const ExpenseAdd = () => { const add = useAdd(); return <HeaderIcon icon="add" label="Add Expense" onPress={() => add("expense")} />; };
-const SettingsButton = () => {
-  const nav = useNavigation<any>();
-  return <HeaderIcon icon="settings-outline" label="Settings" onPress={() => nav.push("Settings")} />;
-};
 
 // Each tab is its own stack, so detail screens slide in with the tab bar still showing.
-function tabStack(name: string, title: string, Component: React.ComponentType<any>, extra: Partial<NativeStackNavigationOptions>) {
+function tabStack(name: string, title: string, Component: React.ComponentType<any>) {
   return function TabStack() {
     const c = usePalette();
     return (
       <Stack.Navigator screenOptions={stackOptions(c)}>
-        <Stack.Screen name={name} component={Component} options={{ title, ...extra }} />
+        <Stack.Screen name={name} component={Component} options={{ title, headerShown: false }} />
         <Stack.Screen name="ProjectDetail" component={ProjectDetailScreen} options={{ title: "" }} />
         <Stack.Screen name="Settings" component={SettingsScreen} options={{ title: "Settings" }} />
         <Stack.Screen name="Projects" component={ProjectsScreen} options={{ title: "Projects" }} />
@@ -80,13 +73,12 @@ function tabStack(name: string, title: string, Component: React.ComponentType<an
   };
 }
 
+// The tab roots draw their own header (TopBar), like Budget Board.
 const TABS: { name: string; label: string; icon: IconName; iconOn: IconName; Comp: React.ComponentType<any> }[] = [
-  { name: "HomeTab", label: "Home", icon: "home-outline", iconOn: "home",
-    Comp: tabStack("Home", "Home", HomeScreen, { headerLeft: () => <SettingsButton />, headerRight: () => <HomeAdd /> }) },
-  { name: "SalesTab", label: "Sales", icon: "bag-handle-outline", iconOn: "bag-handle",
-    Comp: tabStack("Sales", "Sales", SalesScreen, { headerRight: () => <SaleAdd /> }) },
-  { name: "ExpensesTab", label: "Expenses", icon: "receipt-outline", iconOn: "receipt",
-    Comp: tabStack("Expenses", "Expenses", ExpensesScreen, { headerRight: () => <ExpenseAdd /> }) },
+  { name: "HomeTab", label: "Home", icon: "home-outline", iconOn: "home", Comp: tabStack("Home", "Home", HomeScreen) },
+  { name: "SalesTab", label: "Sales", icon: "bag-handle-outline", iconOn: "bag-handle", Comp: tabStack("Sales", "Sales", SalesScreen) },
+  { name: "ExpensesTab", label: "Expenses", icon: "receipt-outline", iconOn: "receipt", Comp: tabStack("Expenses", "Expenses", ExpensesScreen) },
+  { name: "InsightsTab", label: "Insights", icon: "pie-chart-outline", iconOn: "pie-chart", Comp: tabStack("Insights", "Insights", InsightsScreen) },
 ];
 
 function TabsScreen() {
@@ -96,8 +88,8 @@ function TabsScreen() {
       headerShown: false,
       tabBarActiveTintColor: c.accent,
       tabBarInactiveTintColor: c.secondary,
-      tabBarStyle: { backgroundColor: c.dark ? "#161618" : "#FAF8F4", borderTopColor: c.separator },
-      tabBarLabelStyle: { fontSize: 10, fontWeight: "500" },
+      tabBarStyle: { backgroundColor: c.card, borderTopColor: c.line },
+      tabBarLabelStyle: { fontSize: 10, fontWeight: "600" },
     }}>
       {TABS.map((t) => (
         <Tabs.Screen key={t.name} name={t.name} component={t.Comp} options={{
@@ -110,6 +102,15 @@ function TabsScreen() {
 }
 
 function Shell() {
+  const { prefs } = useStore();
+  return (
+    <AppearanceContext.Provider value={prefs.appearance}>
+      <Themed />
+    </AppearanceContext.Provider>
+  );
+}
+
+function Themed() {
   const { ready } = useStore();
   const c = usePalette();
   useEffect(() => { if (ready) SplashScreen.hideAsync().catch(() => {}); }, [ready]);
@@ -119,7 +120,7 @@ function Shell() {
   const sheet = sheetOptions(c);
   return (
     <NavigationContainer theme={navTheme}>
-      <StatusBar style="auto" />
+      <StatusBar style={c.dark ? "light" : "dark"} />
       <Root.Navigator screenOptions={sheet}>
         <Root.Screen name="Tabs" component={TabsScreen} options={{ headerShown: false, presentation: "card" }} />
         <Root.Screen name="Sale" component={SaleForm} />

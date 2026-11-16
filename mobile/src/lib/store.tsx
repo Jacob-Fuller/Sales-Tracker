@@ -24,8 +24,13 @@ const K = {
   prefs: "profitPocket.prefs",
 };
 
-export type Prefs = { period: Period };
-const DEFAULT_PREFS: Prefs = { period: "fy" };
+export type Prefs = {
+  period: Period;
+  hide: boolean;                              // amounts shown as dots (eye button)
+  appearance: "system" | "light" | "dark";
+  insightsBy: "project" | "channel";          // where money comes from, on Insights
+};
+const DEFAULT_PREFS: Prefs = { period: "fy", hide: false, appearance: "system", insightsBy: "project" };
 export type SyncState = "idle" | "syncing" | "ok" | "failed" | "authLost";
 type Tomb = (id: string) => void;
 
@@ -271,7 +276,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const money = useMemo(() => makeMoney(data.settings.currency), [data.settings.currency]);
+  const money = useMemo(() => makeMoney(data.settings.currency, prefs.hide), [data.settings.currency, prefs.hide]);
 
   const value = useMemo<Ctx>(() => ({
     ready, data, money, user, sync, prefs, setPrefs, update, syncNow, sendCode, verifyCode, signOut, deleteAccount,

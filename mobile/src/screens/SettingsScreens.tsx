@@ -20,7 +20,7 @@ function useSettings() {
 /* ---------- Settings ---------- */
 export function SettingsScreen() {
   const nav = useNavigation<any>();
-  const { user, sync } = useStore();
+  const { user, sync, prefs, setPrefs } = useStore();
   const premium = usePremium();
   const [s, set] = useSettings();
   const c = usePalette();
@@ -63,6 +63,15 @@ export function SettingsScreen() {
           options={MONTHS.map((m, i) => ({ value: String(i + 1), label: `Starts 1 ${m}` }))} />
         <Cell title="Sales Channels" chevron onPress={() => nav.push("Channels")} />
         <Cell title="Expense Categories" chevron onPress={() => nav.push("Categories")} />
+      </Section>
+
+      <Section footer="Home shows how much of your profit to put aside for tax. Leave at 0 to hide it.">
+        <TaxRateRow value={s.taxRate} onCommit={(v) => set({ taxRate: v })} />
+      </Section>
+
+      <Section>
+        <PickerRow label="Appearance" value={prefs.appearance} onChange={(v) => setPrefs({ appearance: v as any })}
+          options={[{ value: "system", label: "Match iPhone" }, { value: "light", label: "Light" }, { value: "dark", label: "Dark" }]} />
       </Section>
 
       <Section>
@@ -299,4 +308,16 @@ function Plan({ title, price, onPress, disabled, primary }: { title: string; pri
       <Text style={[{ fontSize: 17, color: fg }, NUM]}>{price}</Text>
     </Pressable>
   );
+}
+
+function TaxRateRow({ value, onCommit }: { value: number; onCommit: (v: number) => void }) {
+  const [text, setText] = useState(value ? String(value) : "");
+  const commit = () => {
+    const v = parseFloat(text.replace(",", "."));
+    const n = isFinite(v) ? Math.min(60, Math.max(0, Math.round(v * 10) / 10)) : 0;
+    setText(n ? String(n) : "");
+    if (n !== value) onCommit(n);
+  };
+  return <TextRow label="Put Aside for Tax %" money value={text} onChangeText={setText} onEndEditing={commit} onBlur={commit}
+    placeholder="0" keyboardType="decimal-pad" returnKeyType="done" />;
 }
