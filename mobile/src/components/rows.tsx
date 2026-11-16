@@ -11,20 +11,33 @@ import { FREE_LIMITS } from "../lib/config";
 import { FREQS, keyOf, shortDate, type Link, type LinkKey, type Recurring, type Snapshot } from "../lib/model";
 import { usePremium, type LimitKind } from "../lib/premium";
 import { useStore } from "../lib/store";
-import { usePalette } from "../theme";
-import { Cell, tap, type Option } from "./ui";
+import { SWATCHES, usePalette, type Palette, type Swatch } from "../theme";
+import { Cell, Dot, tap, type Option } from "./ui";
 
 export const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name);
 export const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? "" : "s"}`;
 
 /* ---------- projects ---------- */
-export type Project = { key: LinkKey; id: string; name: string; kind: "items" | "groups" };
+export type Project = { key: LinkKey; id: string; name: string; kind: "items" | "groups"; color: Swatch };
+
+// A project's colour: the one picked for it, or one chosen from its name.
+const isSwatch = (v: any): v is Swatch => (SWATCHES as readonly string[]).includes(v);
+export function swatchFor(name: string, color: string | null | undefined): Swatch {
+  if (isSwatch(color)) return color;
+  let h = 0; for (const ch of String(name)) h = (h * 31 + ch.charCodeAt(0)) % 9973;
+  return SWATCHES[h % SWATCHES.length];
+}
 
 export function projects(d: Snapshot): Project[] {
   return [
-    ...d.items.map((i) => ({ key: "p:" + i.id, id: i.id, name: i.name, kind: "items" as const })),
-    ...d.groups.map((g) => ({ key: "g:" + g.id, id: g.id, name: g.name, kind: "groups" as const })),
+    ...d.items.map((i) => ({ key: "p:" + i.id, id: i.id, name: i.name, kind: "items" as const, color: swatchFor(i.name, i.color) })),
+    ...d.groups.map((g) => ({ key: "g:" + g.id, id: g.id, name: g.name, kind: "groups" as const, color: swatchFor(g.name, g.color) })),
   ].sort(byName);
+}
+// The colour to draw for a record's project (grey when it has none).
+export function colorOf(c: Palette, d: Snapshot, r: Link): string {
+  const p = keyOf(r) === "general" ? null : findProject(d, keyOf(r));
+  return p ? c.sw[p.color] : c.other;
 }
 export const findProject = (d: Snapshot, key: LinkKey) => projects(d).find((p) => p.key === key);
 export const projectName = (d: Snapshot, r: Link) => (keyOf(r) === "general" ? null : findProject(d, keyOf(r))?.name || null);
@@ -39,8 +52,9 @@ const dot = (...parts: (string | null | undefined)[]) => parts.filter(Boolean).j
 export function SaleCell({ s, first, inProject }: { s: SaleRow; first?: boolean; inProject?: boolean }) {
   const { data, money } = useStore();
   const nav = useNavigation<any>();
+  const c = usePalette();
   return (
-    <Cell first={first} title={s.productName} subtitle={dot(shortDate(s.date), s.channel, inProject ? null : projectName(data, s))}
+    <Cell first={first} lead={inProject ? undefined : <Dot color={colorOf(c, data, s)} size={8} />} title={s.productName} subtitle={dot(shortDate(s.date), s.channel, inProject ? null : projectName(data, s))}
       value={"+" + money.money(s.net)} tone="gain" onPress={() => nav.navigate("Sale", { id: s.id })} />
   );
 }
@@ -48,20 +62,22 @@ export function SaleCell({ s, first, inProject }: { s: SaleRow; first?: boolean;
 export function ExpenseCell({ e, first, inProject }: { e: ExpenseRow; first?: boolean; inProject?: boolean }) {
   const { data, money } = useStore();
   const nav = useNavigation<any>();
+  const c = usePalette();
   const freq = e.frequency ? (FREQS as any)[e.frequency]?.label : null;
   return (
-    <Cell first={first} title={e.description} subtitle={dot(shortDate(e.date), freq, inProject ? null : projectName(data, e))}
+    <Cell first={first} lead={inProject ? undefined : <Dot color={colorOf(c, data, e)} size={8} />} title={e.description} subtitle={dot(shortDate(e.date), freq, inProject ? null : projectName(data, e))}
       value={money.money(e.amount)} onPress={() => nav.navigate("Expense", e.recurringId ? { id: e.recurringId, recurring: true } : { id: e.id })} />
   );
 }
 
-export function RecurringCell({ r, first }: { r: Recurring; first?: boolean }) {
+export function RecurringCell({ r, first, inProject }: { r: Recurring; first?: boolean; inProject?: boolean }) {
   const { data, money } = useStore();
   const nav = useNavigation<any>();
+  const c = usePalette();
   const f = FREQS[r.frequency] || FREQS.monthly, active = isActive(r), nd = active ? nextDue(r) : null;
   return (
-    <Cell first={first} title={r.description}
-      subtitle={active ? dot(f.label, nd ? "next " + shortDate(nd) : null, projectName(data, r)) : "Stopped"}
+    <Cell first={first} lead={inProject ? undefined : <Dot color={active ? colorOf(c, data, r) : c.other} size={8} />} title={r.description}
+      subtitle={active ? dot(f.label, nd ? "next " + shortDate(nd) : null, inProject ? null : projectName(data, r)) : "Stopped"}
       value={money.money(r.amount)} tone={active ? undefined : "secondary"}
       onPress={() => nav.navigate("Expense", { id: r.id, recurring: true })} />
   );

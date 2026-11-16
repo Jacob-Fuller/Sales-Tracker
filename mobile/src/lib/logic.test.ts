@@ -6,6 +6,7 @@ import { expensesAll, groupKeys, nextDue, occurrences, range, recurringMonthly, 
 import { mergeSnapshots, sameSnapshot, buildHistory } from "./merge.ts";
 import { emptySnapshot, normaliseSnapshot, keyOf, parseKey, type Snapshot } from "./model.ts";
 import { taxData, taxReportHtml, taxYear, taxYears } from "./taxReport.ts";
+import { comingUp, figures, monthly, sumBy, taxAside, toCsv, topWithRest } from "./insights.ts";
 
 let n = 0;
 const test = (name: string, fn: () => void) => { fn(); n++; console.log("ok -", name); };
@@ -169,6 +170,64 @@ test("tax report totals", () => {
   assert.equal(t.byCategory[0].name, "AI tools");
   const html = taxReportHtml(d, taxYear(2026, 7), (n) => "$" + n.toFixed(2), { linkLabel: () => "x", generated: new Date(2026, 9, 12) });
   assert.ok(html.includes("2026–27") && html.includes("$22.95"));
+});
+
+test("insights: totals by key, top-n with rest", () => {
+  const rows = [{ k: "a", v: 5 }, { k: "b", v: 1 }, { k: "a", v: 2 }, { k: "c", v: 3 }, { k: "d", v: 0.5 }];
+  const s = sumBy(rows, (r) => r.k, (r) => r.k.toUpperCase(), (r) => r.v);
+  assert.deepEqual(s.map((x) => [x.key, x.v]), [["a", 7], ["c", 3], ["b", 1], ["d", 0.5]]);
+  const t = topWithRest(s, 2);
+  assert.deepEqual(t.map((x) => [x.name, x.v]), [["A", 7], ["C", 3], ["Everything else", 1.5]]);
+  assert.equal(topWithRest(s, 3).length, 4); // one left over: shown as itself
+});
+
+test("insights: monthly figures and headline numbers", () => {
+  const d = sample();
+  const m = monthly(d, 12, new Date(2026, 7, 20));
+  assert.equal(m.length, 12);
+  assert.equal(m[11].key, "2026-08");
+  assert.equal(m[11].label, "Aug");
+  assert.equal(m[11].kept.toFixed(2), "22.95");
+  assert.equal(m[11].spent, 20 + 30); // icons + the Aug 31 AI payment (past by the real today)
+  const f = figures(salesJoined(d), [{ amount: 20, date: "2026-08-10" } as any]);
+  assert.equal(f.count, 1);
+  assert.equal(f.units, 3);
+  assert.equal(f.average.toFixed(2), "22.95");
+  assert.equal(f.fees.toFixed(2), "4.05");
+  assert.equal(f.discounts.toFixed(2), "3.00");
+  assert.equal((f.margin as number).toFixed(4), ((22.95 - 20) / 22.95).toFixed(4));
+});
+
+test("coming up: next payment of each repeating cost within the window", () => {
+  const d = sample();
+  addRecord(d, "recurring", { amount: 5, description: "Weekly", category: "Other", vendor: "", frequency: "weekly",
+    startDate: "2026-08-03", endDate: null, itemId: null, groupId: null }, 5);
+  addRecord(d, "recurring", { amount: 9, description: "Stopped", category: "Other", vendor: "", frequency: "monthly",
+    startDate: "2026-01-01", endDate: "2026-03-01", itemId: null, groupId: null }, 5);
+  const u = comingUp(d, 30, "2026-08-20");
+  assert.deepEqual(u.map((x) => [x.r.description, x.date, x.inDays]), [["Weekly", "2026-08-24", 4], ["AI subscription", "2026-08-31", 11]]);
+  assert.equal(comingUp(d, 3, "2026-08-20").length, 0);
+});
+
+test("tax set-aside and CSV export", () => {
+  assert.equal(taxAside(1000, 25), 250);
+  assert.equal(taxAside(-50, 25), 0);
+  assert.equal(taxAside(1000, 0), 0);
+  const d = sample();
+  d.products[0].name = 'Monthly, "Pro"';
+  const csv = toCsv(d, range("all"), () => "Roster App");
+  const lines = csv.trim().split("\n");
+  assert.equal(lines[0].split(",")[0], "Type");
+  assert.ok(lines.some((l) => l.startsWith('Sale,2026-08-05,"Monthly, ""Pro""",Roster App,App Store,3,10.00,15.00,27.00,4.05,22.95')));
+  assert.ok(lines.some((l) => l.startsWith("Expense,2026-08-10,Icons,Roster App,Other,,,,,,-20.00")));
+});
+
+test("old saved data gets the new fields", () => {
+  const d = normaliseSnapshot({ items: [{ id: "x", name: "A" }], groups: [{ id: "g", name: "G", color: "teal" }], settings: { taxRate: 99 } });
+  assert.equal(d.items[0].color, null);
+  assert.equal(d.groups[0].color, "teal");
+  assert.equal(d.settings.taxRate, 60);
+  assert.equal(normaliseSnapshot({}).settings.taxRate, 0);
 });
 
 console.log(`${n} checks passed`);

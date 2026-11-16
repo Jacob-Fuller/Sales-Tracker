@@ -6,6 +6,8 @@ import { ActivityIndicator, Alert, Platform, View } from "react-native";
 import { linkLabel } from "../components/rows";
 import { Cell, Screen, Section, Tile } from "../components/ui";
 import { taxData, taxReportHtml, taxYears, type TaxYear } from "../lib/taxReport";
+import { toCsv } from "../lib/insights";
+import { range, type Range } from "../lib/calc";
 import { useStore } from "../lib/store";
 import { usePalette } from "../theme";
 import { APP_NAME } from "../lib/config";
@@ -44,9 +46,34 @@ export function TaxReportScreen() {
     }
   };
 
+  // A spreadsheet (CSV) of every sale and payment in a range: opens in Numbers, Excel or Google Sheets.
+  const [csvBusy, setCsvBusy] = useState<string | null>(null);
+  const exportCsv = async (id: string, rg: Range, label: string) => {
+    if (csvBusy) return;
+    setCsvBusy(id);
+    try {
+      const text = toCsv(data, rg, (r) => linkLabel(data, r));
+      const name = `${APP_NAME} ${label}.csv`;
+      if (Platform.OS === "web") {
+        const a = (globalThis as any).document.createElement("a");
+        a.href = URL.createObjectURL(new Blob([text], { type: "text/csv" }));
+        a.download = name; a.click();
+        return;
+      }
+      const dest = (FileSystem.cacheDirectory || "") + name;
+      await FileSystem.writeAsStringAsync(dest, text, { encoding: FileSystem.EncodingType.UTF8 });
+      if (await Sharing.isAvailableAsync()) await Sharing.shareAsync(dest, { mimeType: "text/csv", UTI: "public.comma-separated-values-text", dialogTitle: name });
+    } catch {
+      Alert.alert("Couldn't make the spreadsheet", "Try again.");
+    } finally {
+      setCsvBusy(null);
+    }
+  };
+  const spin = <View style={{ width: 30, alignItems: "center" }}><ActivityIndicator color={c.accent} /></View>;
+
   return (
     <Screen>
-      <Section>
+      <Section title="PDF for your accountant">
         {years.map((ty) => {
           const t = taxData(data, ty);
           const empty = !t.sales.length && !t.exps.length;
@@ -58,6 +85,15 @@ export function TaxReportScreen() {
               onPress={() => make(ty)} />
           );
         })}
+      </Section>
+      <Section title="Spreadsheet (CSV)" footer="Every sale and payment, one row each. Opens in Numbers, Excel or Google Sheets.">
+        {years.map((ty) => (
+          <Cell key={"csv" + ty.start} lead={csvBusy === String(ty.start) ? spin : <Tile icon="grid" color="#34C759" />}
+            title={`${ty.short} Financial Year`} subtitle={ty.label} chevron
+            onPress={() => exportCsv(String(ty.start), ty.range, `${ty.short.replace("–", "-")} financial year`)} />
+        ))}
+        <Cell lead={csvBusy === "all" ? spin : <Tile icon="grid" color="#34C759" />} title="Everything" chevron
+          onPress={() => exportCsv("all", range("all"), "all time")} />
       </Section>
     </Screen>
   );

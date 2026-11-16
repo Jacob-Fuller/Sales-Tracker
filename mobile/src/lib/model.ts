@@ -10,10 +10,11 @@ export type Rec = { id: string; createdAt: number; updatedAt: number };
 
 export type Link = { itemId: string | null; groupId: string | null };
 
-export type Group = Rec & { name: string };
+export type Group = Rec & { name: string; color: string | null };
 export type Item = Rec & {
   name: string; groupId: string | null; status: Status;
   logo: string | null; iconText: string | null; iconHue: number | null;
+  color: string | null; // a theme swatch name (see theme.ts); null = picked from the name
 };
 export type Product = Rec & Link & { name: string; price: number };
 export type Customer = Rec & { name: string; email: string; phone: string };
@@ -29,7 +30,9 @@ export type Recurring = Rec & Link & {
 export type Channel = { name: string; fee: number };
 export type Settings = {
   currency: string; fyStartMonth: number; // 1 = January
-  channels: Channel[]; categories: string[]; updatedAt: number;
+  channels: Channel[]; categories: string[];
+  taxRate: number; // % of profit to put aside for tax; 0 = not shown
+  updatedAt: number;
 };
 
 export type Snapshot = {
@@ -101,6 +104,7 @@ export function defaultSettings(currency = "AUD", region = "AU"): Settings {
     fyStartMonth: FY_BY_REGION[(region || "").toUpperCase()] || 1,
     channels: DEFAULT_CHANNELS.map((c) => ({ ...c })),
     categories: DEFAULT_CATEGORIES.slice(),
+    taxRate: 0,
     updatedAt: 0,
   };
 }
@@ -131,11 +135,12 @@ export function normaliseSnapshot(raw: any, fallbackSettings?: Settings): Snapsh
     : fs.channels;
   const categories: string[] = Array.isArray(s.categories) ? s.categories.filter((c: any) => typeof c === "string" && c) : fs.categories;
   return {
-    groups: arr("groups").map((g: any) => ({ ...base(g), name: str(g.name, "Project") })),
+    groups: arr("groups").map((g: any) => ({ ...base(g), name: str(g.name, "Project"), color: strOrNull(g.color) })),
     items: arr("items").map((p: any) => ({
       ...base(p), name: str(p.name, "Item"), groupId: strOrNull(p.groupId),
       status: (STATUSES as readonly string[]).includes(p.status) ? p.status : "In development",
       logo: strOrNull(p.logo), iconText: strOrNull(p.iconText), iconHue: typeof p.iconHue === "number" ? p.iconHue : null,
+      color: strOrNull(p.color),
     })),
     products: arr("products").map((p: any) => ({ ...base(p), ...link(p), name: str(p.name, "Product"), price: Math.max(0, num(p.price)) })),
     customers: arr("customers").map((c: any) => ({ ...base(c), name: str(c.name, "Customer"), email: str(c.email), phone: str(c.phone) })),
@@ -159,6 +164,7 @@ export function normaliseSnapshot(raw: any, fallbackSettings?: Settings): Snapsh
       fyStartMonth: Math.min(12, Math.max(1, Math.round(num(s.fyStartMonth, fs.fyStartMonth)))),
       channels: channels.length ? channels : fs.channels,
       categories: categories.length ? categories : fs.categories,
+      taxRate: Math.min(60, Math.max(0, num(s.taxRate, fs.taxRate))),
       updatedAt: num(s.updatedAt),
     },
     tombstones: r.tombstones && typeof r.tombstones === "object" ? { ...r.tombstones } : {},

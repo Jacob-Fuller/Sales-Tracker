@@ -1,6 +1,6 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useLayoutEffect, useRef, useState } from "react";
-import { Alert } from "react-native";
+import { Alert, Pressable, View } from "react-native";
 import { byName, findProject, limitText, projectOptions, validLink } from "../components/rows";
 import { AmountField, Cell, DateRow, Form, HeaderText, PickerRow, Section, StepperRow, TextRow, success, type Option } from "../components/ui";
 import { addRecord, patchRecord, productHasSales, removeRecord } from "../lib/actions";
@@ -8,6 +8,7 @@ import { isActive } from "../lib/calc";
 import { FREQS, keyOf, parseKey, today, type FreqKey, type Kind } from "../lib/model";
 import { usePremium } from "../lib/premium";
 import { useStore } from "../lib/store";
+import { SWATCHES, usePalette, type Swatch } from "../theme";
 
 const toNum = (s: string) => { const v = parseFloat(String(s).replace(/[^0-9.\-]/g, "")); return isFinite(v) ? v : NaN; };
 const numText = (n: number | undefined | null) => (n == null || !isFinite(n) ? "" : String(Math.round(n * 100) / 100));
@@ -102,6 +103,16 @@ export function SaleForm() {
         <TextRow label="Discount %" money value={discount} onChangeText={setDiscount} placeholder="0" keyboardType="decimal-pad" />
         <DateRow value={date} onChange={setDate} />
       </Section>
+      {rec ? (
+        <Section footer="Logs the same sale again, dated today.">
+          <Cell title="Sell Again" accent center onPress={() => {
+            update((d) => { addRecord(d, "sales", { productId: rec.productId, customerId: rec.customerId, quantity: rec.quantity,
+              discount: rec.discount, fee: rec.fee, channel: rec.channel, date: today() }); });
+            success();
+            nav.goBack();
+          }} />
+        </Section>
+      ) : null}
       {rec ? <DeleteSection title="Delete Sale" onPress={del} /> : null}
     </Form>
   );
@@ -213,6 +224,7 @@ export function ProjectForm() {
   const { data, update } = useStore();
   const rec = params.key ? findProject(data, params.key) : undefined;
   const [name, setName] = useState(rec?.name || "");
+  const [color, setColor] = useState<Swatch>(rec ? rec.color : SWATCHES[(data.items.length + data.groups.length + 1) % SWATCHES.length]);
   const del = () => {
     if (!rec) return;
     Alert.alert("Delete this project?", "Its sales and expenses are kept.", [
@@ -226,8 +238,8 @@ export function ProjectForm() {
   useSheetHeader(rec ? "Edit Project" : "New Project", () => {
     if (!name.trim()) return missing("Enter the project name");
     update((d) => {
-      if (rec) patchRecord(d, rec.kind, rec.id, { name: name.trim() });
-      else addRecord(d, "items", { name: name.trim(), groupId: null, status: "Live", logo: null, iconText: null, iconHue: null });
+      if (rec) patchRecord(d, rec.kind, rec.id, { name: name.trim(), color });
+      else addRecord(d, "items", { name: name.trim(), groupId: null, status: "Live", logo: null, iconText: null, iconHue: null, color });
     });
     success();
     nav.goBack();
@@ -237,7 +249,28 @@ export function ProjectForm() {
       <Section>
         <TextRow label="Name" value={name} onChangeText={setName} placeholder="Required" autoFocus={!rec} autoCapitalize="words" />
       </Section>
+      <Section title="Colour">
+        <Swatches value={color} onChange={setColor} />
+      </Section>
       {rec ? <DeleteSection title="Delete Project" onPress={del} /> : null}
     </Form>
   );
 }
+
+function Swatches({ value, onChange }: { value: Swatch; onChange: (s: Swatch) => void; first?: boolean }) {
+  const c = usePalette();
+  return (
+    <View style={{ flexDirection: "row", justifyContent: "space-between", padding: 14, backgroundColor: c.card }}>
+      {SWATCHES.map((k) => {
+        const on = k === value;
+        return (
+          <Pressable key={k} onPress={() => onChange(k)} accessibilityRole="button" accessibilityLabel={k} accessibilityState={{ selected: on }}
+            style={{ width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center", borderWidth: 2, borderColor: on ? c.sw[k] : "transparent" }}>
+            <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: c.sw[k] }} />
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
