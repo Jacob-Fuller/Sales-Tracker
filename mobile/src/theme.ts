@@ -1,5 +1,5 @@
 // Apple-style look: the system font, grouped lists, and colours that follow
-// the phone's light or dark mode. Ember is the accent; green is money in.
+// the phone's light or dark mode. Gold is the accent; green is money in.
 import { useColorScheme } from "react-native";
 
 export type Palette = {
@@ -20,15 +20,15 @@ export type Palette = {
 
 export const LIGHT: Palette = {
   dark: false,
-  bg: "#F2F2F7",
+  bg: "#F4F2EE",
   card: "#FFFFFF",
-  fill: "#E9E9EE",
-  pressed: "#E5E5EA",
-  text: "#000000",
-  secondary: "#6C6C70",
-  tertiary: "#AEAEB2",
-  separator: "#C6C6C8",
-  accent: "#E5580C",
+  fill: "#ECE9E3",
+  pressed: "#E6E2DA",
+  text: "#17150F",
+  secondary: "#6B665C",
+  tertiary: "#ABA59A",
+  separator: "#D3CEC4",
+  accent: "#8C6A1E",
   onAccent: "#FFFFFF",
   gain: "#248A3D",
   loss: "#D70015",
@@ -36,16 +36,16 @@ export const LIGHT: Palette = {
 
 export const DARK: Palette = {
   dark: true,
-  bg: "#000000",
-  card: "#1C1C1E",
-  fill: "#2C2C2E",
-  pressed: "#2C2C2E",
-  text: "#FFFFFF",
-  secondary: "#98989F",
-  tertiary: "#636366",
-  separator: "#38383A",
-  accent: "#FF7A45",
-  onAccent: "#FFFFFF",
+  bg: "#121214",
+  card: "#1B1B1E",
+  fill: "#26262A",
+  pressed: "#2A2A2F",
+  text: "#F3EFE6",
+  secondary: "#A8A39A",
+  tertiary: "#6F6B64",
+  separator: "#2F2F34",
+  accent: "#D4A946",
+  onAccent: "#17130A",
   gain: "#30D158",
   loss: "#FF453A",
 };

@@ -96,7 +96,7 @@ function TabsScreen() {
       headerShown: false,
       tabBarActiveTintColor: c.accent,
       tabBarInactiveTintColor: c.secondary,
-      tabBarStyle: { backgroundColor: c.dark ? "#121212" : "#F9F9F9", borderTopColor: c.separator },
+      tabBarStyle: { backgroundColor: c.dark ? "#161618" : "#FAF8F4", borderTopColor: c.separator },
       tabBarLabelStyle: { fontSize: 10, fontWeight: "500" },
     }}>
       {TABS.map((t) => (

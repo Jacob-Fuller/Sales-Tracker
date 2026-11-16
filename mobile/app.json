@@ -7,7 +7,7 @@
     "icon": "./assets/icon.png",
     "scheme": "profitpocket",
     "userInterfaceStyle": "automatic",
-    "backgroundColor": "#F2F2F7",
+    "backgroundColor": "#F4F2EE",
     "newArchEnabled": true,
     "ios": {
       "bundleIdentifier": "au.profitpocket.app",
@@ -30,11 +30,11 @@
     },
     "android": {
       "package": "au.profitpocket.app",
-      "adaptiveIcon": { "foregroundImage": "./assets/adaptive-icon.png", "backgroundColor": "#0D0C14" }
+      "adaptiveIcon": { "foregroundImage": "./assets/adaptive-icon.png", "backgroundColor": "#121214" }
     },
     "web": { "favicon": "./assets/favicon.png" },
     "plugins": [
-      ["expo-splash-screen", { "image": "./assets/splash-icon.png", "imageWidth": 150, "resizeMode": "contain", "backgroundColor": "#F2F2F7", "dark": { "backgroundColor": "#000000" } }],
+      ["expo-splash-screen", { "image": "./assets/splash-icon.png", "imageWidth": 150, "resizeMode": "contain", "backgroundColor": "#F4F2EE", "dark": { "backgroundColor": "#121214" } }],
       "expo-iap",
       "expo-font",
       "expo-localization",
