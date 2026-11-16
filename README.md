@@ -1,7 +1,7 @@
-# Sales Tracker / Accounting Board
+# Sales Tracker / Profit Board
 
 > **The iPhone app now lives in [`mobile/`](mobile/README.md)** (React Native/Expo,
-> named Accounting Board). Privacy and support pages are in `docs/`. The Flask web
+> named Profit Board). Privacy and support pages are in `docs/`. The Flask web
 > version below is the earlier build and is kept for reference.
 
 

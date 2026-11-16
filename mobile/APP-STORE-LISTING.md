@@ -1,7 +1,7 @@
-# Accounting Board – App Store listing
+# Profit Board – App Store listing
 
 ## App information
-- **Name:** Accounting Board
+- **Name:** Profit Board
 - **Subtitle:** Sales, expenses & real profit
 - **Bundle ID:** au.profitpocket.app
 - **Primary category:** Finance · **Secondary:** Business
@@ -13,9 +13,9 @@
 Know exactly what you keep. Record a sale, log a cost, and see your real profit, with store fees and subscriptions already counted.
 
 ## Description
-Accounting Board shows you what your side hustle or small business actually makes.
+Profit Board shows you what your side hustle or small business actually makes.
 
-Record a sale in seconds and Accounting Board takes off the store's cut for you, whether you sell on the App Store, Etsy, eBay, at the markets or from your own website. Add your costs and subscriptions once and every payment is counted on its own date, so your profit is always up to date without the spreadsheet.
+Record a sale in seconds and Profit Board takes off the store's cut for you, whether you sell on the App Store, Etsy, eBay, at the markets or from your own website. Add your costs and subscriptions once and every payment is counted on its own date, so your profit is always up to date without the spreadsheet.
 
 KNOW YOUR REAL NUMBERS
 • Profit, money in and money out for this month, this financial year or all time
@@ -38,7 +38,7 @@ MADE TO FIT YOU
 
 No ads. No tracking. Your numbers stay yours.
 
-ACCOUNTING BOARD PREMIUM
+PROFIT BOARD PREMIUM
 The free plan includes every feature for a small setup. Premium unlocks unlimited projects and repeating costs with a one-off purchase. No subscription.
 Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
 
@@ -59,4 +59,4 @@ Attach it to the version before submitting. Remove the monthly subscription from
 - No tracking, no analytics, no advertising.
 
 ## App Review notes
-Accounting Board works fully without an account; no sign-in is needed to review it. Premium can be tested with a Sandbox account from the paywall (Settings → Go Premium, or by adding a fourth project).
+Profit Board works fully without an account; no sign-in is needed to review it. Premium can be tested with a Sandbox account from the paywall (Settings → Go Premium, or by adding a fourth project).

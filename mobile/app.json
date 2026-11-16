@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Accounting Board",
+    "name": "Profit Board",
     "slug": "profit-pocket",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -15,7 +15,7 @@
       "supportsTablet": false,
       "config": { "usesNonExemptEncryption": false },
       "infoPlist": {
-        "CFBundleDisplayName": "Accounting Board",
+        "CFBundleDisplayName": "Profit Board",
         "ITSAppUsesNonExemptEncryption": false
       },
       "privacyManifests": {
@@ -38,7 +38,7 @@
       "expo-iap",
       "expo-font",
       "expo-localization",
-      ["expo-image-picker", { "photosPermission": "Accounting Board uses your photos so you can add a logo to your projects.", "cameraPermission": false, "microphonePermission": false }]
+      ["expo-image-picker", { "photosPermission": "Profit Board uses your photos so you can add a logo to your projects.", "cameraPermission": false, "microphonePermission": false }]
     ]
   }
 }
