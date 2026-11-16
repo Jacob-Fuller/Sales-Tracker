@@ -28,8 +28,8 @@ export const LIGHT: Palette = {
   secondary: "#6B665C",
   tertiary: "#ABA59A",
   separator: "#D3CEC4",
-  accent: "#8C6A1E",
-  onAccent: "#FFFFFF",
+  accent: "#2A2722",
+  onAccent: "#F5EFE3",
   gain: "#248A3D",
   loss: "#D70015",
 };
