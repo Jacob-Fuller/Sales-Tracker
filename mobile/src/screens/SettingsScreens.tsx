@@ -244,8 +244,8 @@ export function PaywallScreen() {
         </Pressable>
       </View>
       <View style={{ alignItems: "center", marginTop: 8 }}>
-        <View style={{ width: 64, height: 64, borderRadius: 16, backgroundColor: "#FF9500", alignItems: "center", justifyContent: "center" }}>
-          <Ionicons name="star" size={34} color="#FFFFFF" />
+        <View style={{ width: 64, height: 64, borderRadius: 16, backgroundColor: c.accent, alignItems: "center", justifyContent: "center" }}>
+          <Ionicons name="star" size={34} color={c.onAccent} />
         </View>
         <Text style={{ fontSize: 28, fontWeight: "700", color: c.text, marginTop: 16, textAlign: "center" }}>{APP_NAME} Premium</Text>
         {reason ? <Text style={{ fontSize: 15, color: c.secondary, marginTop: 6, textAlign: "center" }}>{reason}</Text> : null}
@@ -256,8 +256,7 @@ export function PaywallScreen() {
         </Section>
       </View>
       <View style={{ gap: 10, marginTop: 24 }}>
-        <Plan title="Monthly" price={`${prices.monthly} a month`} primary onPress={() => buy("monthly")} disabled={busy || !supported} />
-        <Plan title="Lifetime" price={`${prices.lifetime} once`} onPress={() => buy("lifetime")} disabled={busy || !supported} />
+        <Plan title="Unlock Premium" price={`${prices.lifetime} once`} primary onPress={() => buy("lifetime")} disabled={busy || !supported} />
       </View>
       {busy ? <ActivityIndicator color={c.accent} style={{ marginTop: 12 }} /> : null}
       {error ? <Text style={{ color: c.loss, textAlign: "center", marginTop: 10 }}>{error}</Text> : null}
@@ -268,7 +267,7 @@ export function PaywallScreen() {
         <Text style={{ color: c.accent, fontSize: 15 }}>Restore Purchases</Text>
       </Pressable>
       <Text style={{ marginTop: 6, lineHeight: 17, fontSize: 12, color: c.secondary }}>
-        Monthly is an auto-renewing subscription charged to your Apple ID. It renews each month unless cancelled at least 24 hours before the end of the current period. Manage or cancel it in your Apple ID settings. Lifetime is a one-off purchase.
+        A one-off purchase charged to your Apple ID. No subscription.
       </Text>
       <View style={{ flexDirection: "row", justifyContent: "center", gap: 20, marginTop: 14 }}>
         <LinkText title="Terms of Use" url={APPLE_EULA_URL} />

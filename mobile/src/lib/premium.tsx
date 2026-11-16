@@ -1,5 +1,5 @@
-// Premium through Apple in-app purchases: a monthly subscription or a one-off
-// lifetime purchase. Free users get every feature with a cap on projects, items
+// Premium through an Apple in-app purchase: a one-off lifetime unlock. (A monthly
+// subscription bought before it was withdrawn is still honoured.) Free users get every feature with a cap on projects, items
 // and recurring costs (FREE_LIMITS in config.ts).
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as IAP from "expo-iap";

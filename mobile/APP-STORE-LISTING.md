@@ -39,7 +39,7 @@ MADE TO FIT YOU
 No ads. No tracking. Your numbers stay yours.
 
 ACCOUNTING BOARD PREMIUM
-The free plan includes every feature for a small setup. Premium unlocks unlimited projects and repeating costs, monthly or as a one-off lifetime purchase. The monthly plan renews automatically unless cancelled at least 24 hours before the end of the period; manage it in your Apple ID settings.
+The free plan includes every feature for a small setup. Premium unlocks unlimited projects and repeating costs with a one-off purchase. No subscription.
 Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
 
 ## Keywords (100 characters max)
@@ -48,10 +48,9 @@ sales tracker,profit,expenses,side hustle,small business,income,bookkeeping,reve
 ## In-app purchases (create in App Store Connect before submitting)
 | Product ID | Type | Price |
 |---|---|---|
-| au.profitpocket.app.premium.monthly | Auto-renewable subscription (1 month), group "Premium" | $0.99 |
-| au.profitpocket.app.premium.lifetime | Non-consumable | $9.99 |
+| au.profitpocket.app.premium.lifetime | Non-consumable | A$9.99 |
 
-Attach both to the version before submitting. The Paid Apps Agreement must be active.
+Attach it to the version before submitting. Remove the monthly subscription from sale (au.profitpocket.app.premium.monthly) if it was created. The Paid Apps Agreement must be active.
 
 ## App Privacy answers
 - **Contact Info → Email Address:** collected only if the person creates an account. App Functionality. Linked to the user. Not used for tracking.
