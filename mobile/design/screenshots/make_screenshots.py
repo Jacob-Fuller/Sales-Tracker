@@ -27,11 +27,11 @@ def backdrop(w, h, cx, cy, seed):
         p2 = (cx + L * math.cos(a + wd), cy + L * math.sin(a + wd))
         rays.append(f'<path d="M{cx} {cy} L{p1[0]:.0f} {p1[1]:.0f} L{p2[0]:.0f} {p2[1]:.0f} Z" fill="#F1D594" opacity="{random.uniform(0.04, 0.08) + 0.05 * up:.3f}"/>')
     dust = "".join(
-        f'<circle cx="{random.uniform(0, w):.0f}" cy="{random.uniform(0, h):.0f}" r="{random.uniform(3, 8):.1f}" fill="#E9E4F5" opacity="{random.uniform(0.1, 0.3):.2f}"'
+        f'<circle cx="{random.uniform(0, w):.0f}" cy="{random.uniform(0, h):.0f}" r="{random.uniform(3, 8):.1f}" fill="#EADFC4" opacity="{random.uniform(0.1, 0.3):.2f}"'
         + (' filter="url(#db)"' if random.random() < 0.5 else "") + "/>" for _ in range(int(w * h / 90000)))
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}" style="position:absolute;inset:0">
 <defs>
-<radialGradient id="base" cx="{cx/w}" cy="{cy/h}" r="1.05"><stop offset="0" stop-color="#3A3955"/><stop offset="0.4" stop-color="#20213A"/><stop offset="1" stop-color="#0E0F1F"/></radialGradient>
+<radialGradient id="base" cx="{cx/w}" cy="{cy/h}" r="1.05"><stop offset="0" stop-color="#38342C"/><stop offset="0.4" stop-color="#1C1B19"/><stop offset="1" stop-color="#0B0B0D"/></radialGradient>
 <radialGradient id="glow" cx="{cx}" cy="{cy}" r="{w*0.9:.0f}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#E8C77E" stop-opacity="0.32"/><stop offset="0.45" stop-color="#C9A35A" stop-opacity="0.08"/><stop offset="1" stop-color="#C9A35A" stop-opacity="0"/></radialGradient>
 <filter id="rb"><feGaussianBlur stdDeviation="14"/></filter><filter id="db"><feGaussianBlur stdDeviation="3"/></filter>
 </defs>
@@ -48,20 +48,20 @@ STATUS = '''<div class="sb" style="color:{fg}"><span>9:41</span><span class="ic"
 def phone(shot, width, x, y, rot=0, dark=False, z=1):
     # Screen is 393 x 852 points; the capture fills it below a 54pt status bar.
     k = width / 433.0
-    bg = "#000" if dark else "#F2F2F7"
-    fg = "#fff" if dark else "#000"
+    bg = "#121214" if dark else "#F4F2EE"
+    fg = "#F3EFE6" if dark else "#17150F"
     return f'''<div class="phone" style="left:{x}px;top:{y}px;width:433px;height:892px;transform:scale({k:.4f}) rotate({rot}deg);z-index:{z}">
 <div class="screen" style="background:{bg}">{STATUS.format(fg=fg)}<img src="{uri(f"{CAP}/{shot}.png")}" style="position:absolute;left:0;top:54px;width:393px;height:798px"/>
 <div class="island"></div><div class="home" style="background:{fg}"></div></div></div>'''
 
 
 def card(html, x, y, w, rot=0, z=5, dark=False):
-    bg = "#2C2C2E;box-shadow:0 40px 90px rgba(0,0,0,.6),0 0 0 3px rgba(233,196,106,.55)" if dark else "#FFFFFF"
+    bg = "#1B1B1E;box-shadow:0 40px 90px rgba(0,0,0,.6),0 0 0 3px rgba(233,196,106,.55)" if dark else "#FFFFFF"
     return f'<div class="card" style="left:{x}px;top:{y}px;width:{w}px;transform:rotate({rot}deg);z-index:{z};background:{bg}">{html}</div>'
 
 
 def row(title, sub, amount, tone="", dark=False):
-    color = {"gain": "#30D158" if dark else "#248A3D", "loss": "#D70015"}.get(tone, "#fff" if dark else "#000")
+    color = {"gain": "#30D158" if dark else "#248A3D", "loss": "#D70015"}.get(tone, "#F3EFE6" if dark else "#17150F")
     return (f'<div class="row"><div><div class="t">{title}</div><div class="s">{sub}</div></div>'
             f'<div class="a" style="color:{color}">{amount}</div></div>')
 
@@ -85,7 +85,7 @@ h1 em{font-style:normal;background:linear-gradient(180deg,#FFE7A6,#E9B44C 60%%,#
 .row .t{font-size:46px;font-weight:600;color:#000}.row .s{font-size:34px;color:#6C6C70;margin-top:6px}
 .row .a{font-size:50px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
 .row+.row{border-top:2px solid #E5E5EA;margin-top:24px;padding-top:24px}
-.dk .t{color:#fff}.dk .s{color:#98989F}.dk .row+.row{border-color:#38383A}
+.dk .t{color:#F3EFE6}.dk .s{color:#98989F}.dk .row+.row{border-color:#38383A}
 .paper{position:absolute;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 60px 120px rgba(0,0,0,.5)}
 .tile{position:absolute;border-radius:22.4%%;box-shadow:0 30px 70px rgba(0,0,0,.5);overflow:hidden}
 '''
@@ -116,7 +116,7 @@ slides["12"] = page(2 * W, body12)
 # 3: sales
 b3 = backdrop(W, H, 645, 1500, 3) + head("Sales", "Every sale, <em>month by month.</em>")
 b3 += phone("light-sales", 1000, 190, 1000, rot=3)
-b3 += card(row("October 2026", "Sales after fees", "$1,279.62", "gain"), 70, 1560, 820, rot=-3, z=6)
+b3 += card(row("October 2026", "Sales after fees", "$907.50", "gain"), 70, 1560, 820, rot=-3, z=6)
 slides["03"] = page(W, b3)
 
 # 4: repeating costs, in dark mode
@@ -128,7 +128,7 @@ slides["04"] = page(W, b4)
 # 5: projects
 b5 = backdrop(W, H, 645, 1500, 5) + head("Projects", "Profit for <em>every</em> project.")
 b5 += phone("light-project", 1000, 230, 1040, rot=-3)
-b5 += card(row("Candle Stall", "This financial year", "$3,780.57") + row("Shift Planner", "This financial year", "$492.23") + row("Word Quest", "This financial year", "$88.95"),
+b5 += card(row("Candle Stall", "This financial year", "$2,504.03") + row("Shift Planner", "This financial year", "$428.43") + row("Word Quest", "This financial year", "$38.12"),
            60, 1960, 900, rot=2, z=6)
 slides["05"] = page(W, b5)
 

@@ -88,23 +88,23 @@ export function taxReportHtml(d: Snapshot, ty: TaxYear, money: (n: number) => st
   @page { size: A4; margin: 14mm 12mm 16mm; }
   * { box-sizing: border-box; }
   html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  body { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; color: #141824; font-size: 9.5pt; margin: 0; }
+  body { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; color: #1C1A16; font-size: 9.5pt; margin: 0; }
   h1 { font-size: 20pt; margin: 0 0 2pt; letter-spacing: -0.3pt; }
-  h2 { font-size: 12pt; margin: 18pt 0 6pt; padding-bottom: 3pt; border-bottom: 1.5pt solid #FF7A45; }
+  h2 { font-size: 12pt; margin: 18pt 0 6pt; padding-bottom: 3pt; border-bottom: 1.5pt solid #B8892E; }
   .sub { color: #5b6275; font-size: 10pt; }
-  .brand { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3pt solid #141824; padding-bottom: 8pt; margin-bottom: 12pt; }
-  .brand .app { font-weight: 800; color: #FF7A45; font-size: 10pt; letter-spacing: 0.5pt; text-transform: uppercase; }
+  .brand { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3pt solid #1C1A16; padding-bottom: 8pt; margin-bottom: 12pt; }
+  .brand .app { font-weight: 800; color: #B8892E; font-size: 10pt; letter-spacing: 0.5pt; text-transform: uppercase; }
   .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8pt; }
   .tile { border: 1pt solid #dfe2ea; border-radius: 6pt; padding: 8pt 10pt; }
   .tile .l { color: #5b6275; font-size: 8.5pt; }
   .tile .v { font-size: 14pt; font-weight: 700; margin-top: 2pt; font-variant-numeric: tabular-nums; }
-  .tile.hero { background: #141824; color: #fff; border-color: #141824; }
+  .tile.hero { background: #1C1A16; color: #fff; border-color: #1C1A16; }
   .tile.hero .l { color: #c6cbe0; }
   table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
   th { text-align: left; font-size: 8pt; color: #5b6275; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3pt; padding: 4pt 5pt; border-bottom: 1pt solid #c9cdd8; }
   td { padding: 4pt 5pt; border-bottom: 0.5pt solid #e7e9ef; vertical-align: top; }
   th.n, td.n, .num td:nth-child(n+2), .num th:nth-child(n+2) { text-align: right; }
-  tr.total td { font-weight: 700; border-top: 1pt solid #141824; border-bottom: none; }
+  tr.total td { font-weight: 700; border-top: 1pt solid #1C1A16; border-bottom: none; }
   td.none { color: #8a90a3; text-align: center; padding: 10pt; }
   .r { text-align: right; }
   .muted { color: #8a90a3; }
