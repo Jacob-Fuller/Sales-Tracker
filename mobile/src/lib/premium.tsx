@@ -8,7 +8,6 @@ import { Platform } from "react-native";
 import { DEFAULT_PRICES, FREE_LIMITS, PREMIUM_ENFORCED, PREMIUM_LIFETIME, PREMIUM_MONTHLY } from "./config";
 import type { Snapshot } from "./model";
 import { useStore } from "./store";
-import { sb } from "./supabase";
 
 const KEY = "profitPocket.premium";
 type Status = { active: boolean; kind: "" | "monthly" | "lifetime" | "complimentary"; until: number };
@@ -53,27 +52,13 @@ export const countOf = (d: Snapshot, kind: LimitKind) =>
   kind === "groups" ? d.groups.length : kind === "items" ? d.items.length : d.recurring.length;
 
 export function PremiumProvider({ children }: { children: React.ReactNode }) {
-  const { user, data } = useStore();
+  const { data } = useStore();
   const [status, setStatus] = useState<Status>({ active: false, kind: "", until: 0 });
   const [prices, setPrices] = useState({ ...DEFAULT_PRICES });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const connected = useRef(false);
   const loadPricesRef = useRef<() => void>(() => {});
-
-  // Complimentary Premium for emails listed in Supabase (complimentary_access).
-  const [comp, setComp] = useState(false);
-  useEffect(() => {
-    if (!user || !sb) { setComp(false); return; }
-    const k = "profitPocket.comp." + user.id;
-    AsyncStorage.getItem(k).then((v) => { if (v === "1") setComp(true); }).catch(() => {});
-    sb.from("complimentary_access").select("email").limit(1).then((r) => {
-      if (r.error) return;
-      const on = !!(r.data && r.data.length);
-      setComp(on);
-      AsyncStorage.setItem(k, on ? "1" : "0").catch(() => {});
-    });
-  }, [user]);
 
   const save = useCallback((s: Status) => { setStatus(s); AsyncStorage.setItem(KEY, JSON.stringify(s)).catch(() => {}); }, []);
 
@@ -148,7 +133,7 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
     } catch { return false; }
   }, [save]);
 
-  const effective: Status = comp && !status.active ? { active: true, kind: "complimentary", until: 0 } : status;
+  const effective = status;
   // Premium is only sold on iPhone for now; elsewhere everything is unlocked.
   const locked = PREMIUM_ENFORCED && supported && !effective.active;
 

@@ -13,7 +13,7 @@ import { StoreProvider, useStore } from "./src/lib/store";
 import { ExpenseForm, ProductForm, ProjectForm, SaleForm } from "./src/screens/Forms";
 import { HomeScreen, ProjectDetailScreen } from "./src/screens/HomeScreens";
 import { AddScreen, ExpensesScreen, ProductsScreen, ProjectsScreen, SalesScreen } from "./src/screens/ListScreens";
-import { AccountScreen, CategoriesScreen, ChannelsScreen, PaywallScreen, SettingsScreen } from "./src/screens/SettingsScreens";
+import { CategoriesScreen, ChannelsScreen, PaywallScreen, SettingsScreen } from "./src/screens/SettingsScreens";
 import { TaxReportScreen } from "./src/screens/TaxReportScreen";
 import { usePalette, type Palette } from "./src/theme";
 
@@ -74,7 +74,6 @@ function tabStack(name: string, title: string, Component: React.ComponentType<an
         <Stack.Screen name="TaxReports" component={TaxReportScreen} options={{ title: "Tax Reports" }} />
         <Stack.Screen name="Channels" component={ChannelsScreen} options={{ title: "Sales Channels", headerLargeTitle: false }} />
         <Stack.Screen name="Categories" component={CategoriesScreen} options={{ title: "Expense Categories", headerLargeTitle: false }} />
-        <Stack.Screen name="Account" component={AccountScreen} options={{ title: "Account", headerLargeTitle: false }} />
       </Stack.Navigator>
     );
   };

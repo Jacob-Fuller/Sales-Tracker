@@ -1,7 +1,7 @@
 # Profit Board (iPhone app)
 
 A native app built with React Native and Expo, rebuilt from the Sales Tracker
-web app. It works fully on the phone; an optional account backs up and syncs.
+web app. Everything stays on the phone (no accounts).
 
 ## What's in it
 - Overview: profit, money in/out and recurring costs for this month, this
@@ -12,7 +12,7 @@ web app. It works fully on the phone; an optional account backs up and syncs.
 - One-off expenses and recurring costs (weekly to yearly) with stop/resume
 - Products and customers
 - Settings: currency, financial-year start, sales channels and their fees,
-  expense categories, optional account (email + 6-digit code), Premium
+  expense categories, Premium
 - Premium through Apple: monthly or lifetime, with restore. Free plan limits are
   in `src/lib/config.ts` (`FREE_LIMITS`), as are the product ids and prices
 
@@ -22,18 +22,16 @@ years), deletes and the sync merge. `npx tsc --noEmit` type-checks. GitHub runs
 both on every push to `mobile/` (Actions → "Profit Board check").
 
 ## Building for TestFlight (no Mac needed)
-Codemagic builds it from `codemagic.yaml` at the repo root (workflow
-"Profit Board iOS → TestFlight"), using the same App Store Connect key as Wisebyte.
-Before the first build:
-1. App Store Connect → Apps → + → New App: "Profit Board", bundle id
-   `au.profitpocket.app` (register it under Identifiers first).
-2. Codemagic → add this repo as an app.
+GitHub builds it on its Macs (`.github/workflows/ios-testflight.yml`, same setup as
+Budget Board). A commit on main with `[testflight]` in its message builds and uploads
+a TestFlight build; or Actions → "iOS build to TestFlight" → Run workflow.
+It needs four repo secrets (Settings → Secrets and variables → Actions), the same
+values as the Budget Board repo: `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8`, `MATCH_PASSWORD`.
 
 ## Before submitting
 - See `APP-STORE-LISTING.md` for the listing text, in-app purchases and privacy answers.
 - Turn on GitHub Pages for this repo (Settings → Pages → main branch, `/docs`)
   so the privacy and support pages are live, and put the contact email in them.
-- Accounts: optional; follow `supabase/README.md`, then fill in `src/lib/config.ts`.
 
 ## Running locally
     npm install

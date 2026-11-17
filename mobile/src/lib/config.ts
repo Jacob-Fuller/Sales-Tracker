@@ -1,12 +1,5 @@
-// App-wide settings. Fill in SUPABASE_URL and SUPABASE_KEY once the Profit
-// Pocket Supabase project exists (see supabase/README.md); until then the app
-// works fully on the phone and the account section stays hidden.
+// App-wide settings. Profit Board keeps everything on the phone (no accounts).
 export const APP_NAME = "Profit Board";
-
-export const SUPABASE_URL = "";
-// The publishable (anon) key is meant to be public; row-level security protects the data.
-export const SUPABASE_KEY = "";
-export const ACCOUNTS_ENABLED = !!(SUPABASE_URL && SUPABASE_KEY);
 
 // Apple in-app purchases (create these in App Store Connect with the same ids).
 export const PREMIUM_MONTHLY = "au.profitpocket.app.premium.monthly";

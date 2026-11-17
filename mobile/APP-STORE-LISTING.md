@@ -53,10 +53,9 @@ sales tracker,profit,expenses,side hustle,small business,income,bookkeeping,reve
 Attach it to the version before submitting. Remove the monthly subscription from sale (au.profitpocket.app.premium.monthly) if it was created. The Paid Apps Agreement must be active.
 
 ## App Privacy answers
-- **Contact Info → Email Address:** collected only if the person creates an account. App Functionality. Linked to the user. Not used for tracking.
-- **User Content → Other User Content** (their sales and expense records): collected only with an account (sync). App Functionality. Linked to the user. Not used for tracking.
+- **Data Not Collected.** Everything stays on the phone; there are no accounts.
 - **Purchases:** handled by Apple; the app only checks entitlement. Answer "No" unless App Store Connect asks specifically.
 - No tracking, no analytics, no advertising.
 
 ## App Review notes
-Profit Board works fully without an account; no sign-in is needed to review it. Premium can be tested with a Sandbox account from the paywall (Settings → Go Premium, or by adding a fourth project).
+Profit Board has no accounts; no sign-in is needed to review it. Premium can be tested with a Sandbox account from the paywall (Settings → Go Premium, or by adding a fourth project).

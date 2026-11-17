@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { ActivityIndicator, Alert, Linking, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button, Cell, Ionicons, PickerRow, Screen, Section, TextRow, Tile, success } from "../components/ui";
-import { ACCOUNTS_ENABLED, APP_NAME, APPLE_EULA_URL, PRIVACY_URL, SUPPORT_URL } from "../lib/config";
+import { APP_NAME, APPLE_EULA_URL, PRIVACY_URL, SUPPORT_URL } from "../lib/config";
 import { CURRENCIES } from "../lib/format";
 import { MONTHS, type Settings } from "../lib/model";
 import { usePremium } from "../lib/premium";
@@ -20,7 +20,6 @@ function useSettings() {
 /* ---------- Settings ---------- */
 export function SettingsScreen() {
   const nav = useNavigation<any>();
-  const { user, sync } = useStore();
   const premium = usePremium();
   const [s, set] = useSettings();
   const c = usePalette();
@@ -41,13 +40,6 @@ export function SettingsScreen() {
               Alert.alert(ok ? "Purchases restored" : "No purchases found");
             }} />
           )}
-        </Section>
-      ) : null}
-
-      {ACCOUNTS_ENABLED ? (
-        <Section>
-          <Cell lead={<Tile icon="cloud" color="#007AFF" />} title={user ? user.email || "Account" : "Back Up and Sync"}
-            subtitle={user ? syncLine(sync) : undefined} chevron onPress={() => nav.push("Account")} />
         </Section>
       ) : null}
 
@@ -74,13 +66,6 @@ export function SettingsScreen() {
   );
 }
 
-function syncLine(sync: { state: string; lastSync: number; dirty: boolean }) {
-  if (sync.state === "syncing") return "Syncing…";
-  if (sync.state === "authLost") return "Sign in again to keep syncing";
-  if (sync.state === "failed") return sync.dirty ? "Waiting to sync" : "Couldn't reach the server";
-  if (sync.lastSync) return "Synced " + ago(sync.lastSync);
-  return "Synced";
-}
 function ago(t: number) {
   const m = Math.round((Date.now() - t) / 60000);
   if (m < 1) return "just now";
@@ -155,73 +140,6 @@ function FeeInput({ value, onCommit }: { value: number; onCommit: (n: number) =>
   React.useEffect(() => { setText(String(value)); }, [value]);
   const commit = () => { const n = parseFloat(text); const v = isFinite(n) ? Math.min(100, Math.max(0, n)) : 0; setText(String(v)); if (v !== value) onCommit(v); };
   return <PlainInput style={[{ width: 56, textAlign: "right", marginRight: 2 }, NUM]} value={text} onChangeText={setText} onEndEditing={commit} onBlur={commit} keyboardType="decimal-pad" />;
-}
-
-/* ---------- Account (email + code) ---------- */
-export function AccountScreen() {
-  const { user, sync, syncNow, sendCode, verifyCode, signOut, deleteAccount } = useStore();
-  const nav = useNavigation<any>();
-  const c = usePalette();
-  const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
-  const [sent, setSent] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-  const run = async (fn: () => Promise<{ ok: boolean; error?: string }>, after?: () => void) => {
-    setBusy(true); setError("");
-    const r = await fn().catch((e) => ({ ok: false, error: String((e && e.message) || e) }));
-    setBusy(false);
-    if (!r.ok) setError(r.error || "Something went wrong");
-    else if (after) after();
-  };
-  const err = error ? <Text style={{ color: c.loss, textAlign: "center", fontSize: 15 }}>{error}</Text> : null;
-
-  if (user) {
-    return (
-      <Screen>
-        <Section footer={syncLine(sync)}>
-          <Cell title={user.email || "Signed in"} />
-        </Section>
-        <Section>
-          <Cell title="Sync Now" accent onPress={() => syncNow()} />
-          <Cell title="Sign Out" accent onPress={() => {
-            Alert.alert("Sign out?", sync.dirty ? "Some changes haven't synced yet and will be lost on this phone." : undefined, [
-              { text: "Cancel", style: "cancel" },
-              { text: "Sign Out", style: "destructive", onPress: () => run(signOut, () => nav.goBack()) },
-            ]);
-          }} />
-        </Section>
-        <Section>
-          <Cell title="Delete Account" destructive onPress={() => {
-            Alert.alert("Delete your account?", "Your account and everything saved in it is permanently deleted.", [
-              { text: "Cancel", style: "cancel" },
-              { text: "Delete", style: "destructive", onPress: () => run(deleteAccount, () => nav.goBack()) },
-            ]);
-          }} />
-        </Section>
-        {err}
-      </Screen>
-    );
-  }
-  return (
-    <Screen>
-      <Section footer={sent ? `Enter the 6-digit code sent to ${email.trim()}.` : "Back up your numbers and use them on more than one device."}>
-        <TextRow label="Email" value={email} onChangeText={(v) => { setEmail(v); setSent(false); }} keyboardType="email-address" autoCapitalize="none"
-          autoComplete="email" textContentType="emailAddress" placeholder="you@example.com" editable={!busy} />
-        {sent ? <TextRow label="Code" value={code} onChangeText={setCode} keyboardType="number-pad" textContentType="oneTimeCode" autoComplete="one-time-code"
-          maxLength={8} placeholder="123456" editable={!busy} autoFocus /> : null}
-      </Section>
-      {busy ? <ActivityIndicator color={c.accent} /> : sent ? (
-        <View style={{ gap: 10 }}>
-          <Button title="Sign In" disabled={code.trim().length < 6} onPress={() => run(() => verifyCode(email, code), () => { success(); nav.goBack(); })} />
-          <Button plain title="Send a New Code" onPress={() => run(() => sendCode(email))} />
-        </View>
-      ) : (
-        <Button title="Email Me a Code" disabled={!/^\S+@\S+\.\S+$/.test(email.trim())} onPress={() => run(() => sendCode(email), () => setSent(true))} />
-      )}
-      {err}
-    </Screen>
-  );
 }
 
 /* ---------- Premium ---------- */

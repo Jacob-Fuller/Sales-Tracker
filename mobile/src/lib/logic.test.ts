@@ -3,7 +3,6 @@
 import assert from "node:assert/strict";
 import { addRecord, patchRecord, removeRecord } from "./actions.ts";
 import { expensesAll, groupKeys, nextDue, occurrences, range, recurringMonthly, salesJoined, totalsFor, trend } from "./calc.ts";
-import { mergeSnapshots, sameSnapshot, buildHistory } from "./merge.ts";
 import { emptySnapshot, normaliseSnapshot, keyOf, parseKey, type Snapshot } from "./model.ts";
 import { taxData, taxReportHtml, taxYear, taxYears } from "./taxReport.ts";
 
@@ -92,32 +91,6 @@ test("deleting a project keeps its items", () => {
   assert.equal(d.recurring[0].groupId, null);
 });
 
-test("merge keeps both devices' new records and the newest edit", () => {
-  const base = sample();
-  const phone = JSON.parse(JSON.stringify(base)) as Snapshot;
-  const ipad = JSON.parse(JSON.stringify(base)) as Snapshot;
-  addRecord(phone, "customers", { name: "A", email: "", phone: "" }, 10);
-  addRecord(ipad, "customers", { name: "B", email: "", phone: "" }, 11);
-  patchRecord(phone, "groups", base.groups[0].id, { name: "Old name" }, 12);
-  patchRecord(ipad, "groups", base.groups[0].id, { name: "New name" }, 13);
-  const m = mergeSnapshots(phone, normaliseSnapshot(ipad));
-  assert.equal(m.customers.length, 2);
-  assert.equal(m.groups[0].name, "New name");
-});
-
-test("merge respects deletions but not later edits", () => {
-  const base = sample();
-  const phone = JSON.parse(JSON.stringify(base)) as Snapshot;
-  const ipad = JSON.parse(JSON.stringify(base)) as Snapshot;
-  const id = base.expenses[0].id;
-  removeRecord(phone, "expenses", id, (x) => { phone.tombstones[x] = 20; }, 20);
-  let m = mergeSnapshots(phone, normaliseSnapshot(ipad));
-  assert.ok(!m.expenses.some((e) => e.id === id));
-  patchRecord(ipad, "expenses", id, { amount: 99 }, 30);
-  m = mergeSnapshots(phone, normaliseSnapshot(ipad));
-  assert.equal(m.expenses.find((e) => e.id === id)?.amount, 99);
-});
-
 test("normalise survives junk and keeps settings", () => {
   const s = normaliseSnapshot({ sales: [null, { id: "x" }], settings: { currency: "usd", fyStartMonth: 40, channels: [] }, groups: "nope" });
   assert.equal(s.sales.length, 0);
@@ -125,18 +98,12 @@ test("normalise survives junk and keeps settings", () => {
   assert.equal(s.settings.currency, "AUD");
   assert.equal(s.settings.fyStartMonth, 12);
   assert.ok(s.settings.channels.length > 0);
-  assert.ok(sameSnapshot(s, normaliseSnapshot(JSON.parse(JSON.stringify(s)))));
 });
 
 test("links round-trip", () => {
   assert.equal(keyOf(parseKey("g:abc")), "g:abc");
   assert.equal(keyOf(parseKey("p:abc")), "p:abc");
   assert.equal(keyOf(parseKey("general")), "general");
-});
-
-test("backup history only adds when there is data", () => {
-  assert.equal(buildHistory(emptySnapshot()).length, 0);
-  assert.equal(buildHistory(sample()).length, 1);
 });
 
 test("financial year ranges and labels", () => {
